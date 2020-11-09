@@ -6,7 +6,7 @@ import java.util.Date;
 
 public class Users {
     /**
-     * 主键id 用户id
+     * 主键id 用户id 在集群、分布式、微服务环境，不要使用自增id，一般使用全局唯一id
      */
     @Id
     private String id;
