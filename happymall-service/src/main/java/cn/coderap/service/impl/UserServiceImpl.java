@@ -2,9 +2,14 @@ package cn.coderap.service.impl;
 
 import cn.coderap.mapper.UsersMapper;
 import cn.coderap.pojo.Users;
+import cn.coderap.pojo.vo.UserVO;
 import cn.coderap.service.UserService;
+import cn.coderap.utils.DateUtil;
+import cn.coderap.utils.MD5Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
 @Service
@@ -12,6 +17,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UsersMapper usersMapper;
+
+    private static final String USER_FACE="http://122.152.205.72:88/group1/M00/00/05/CpoxxFw_8_qAIlFXAAAcIhVPdSg994.png";
 
     @Override
     public boolean queryUsernameIsExist(String username) {
@@ -21,5 +28,24 @@ public class UserServiceImpl implements UserService {
         userCriteria.andEqualTo("username", username);
         Users res = usersMapper.selectOneByExample(userExample);
         return res==null?false:true;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public Users createUser(UserVO userVO) {
+        Users user=new Users();
+        user.setUsername(userVO.getUsername());
+        try {
+            user.setPassword(MD5Utils.getMD5Str(user.getPassword()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //用户昵称默认和用户名一致
+        user.setNickname(userVO.getUsername());
+        //默认头像
+        user.setFace(USER_FACE);
+        //默认生日
+        user.setBirthday(DateUtil.stringToDate("1970-01-01"));
+        return null;
     }
 }
