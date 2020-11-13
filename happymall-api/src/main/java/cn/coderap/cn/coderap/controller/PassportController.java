@@ -1,10 +1,12 @@
 package cn.coderap.cn.coderap.controller;
 
+import cn.coderap.pojo.vo.UserVO;
 import cn.coderap.service.StuServcie;
 import cn.coderap.service.UserService;
 import cn.coderap.utils.JSONResult;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import tk.mybatis.mapper.util.StringUtil;
@@ -32,6 +34,15 @@ public class PassportController {
             return JSONResult.errorMsg("用户名已存在");
         }
         //3、请求成功，用户名没有重复
+        return JSONResult.ok();
+    }
+
+    @PostMapping("/register")
+    public JSONResult register(@RequestBody UserVO userVO) {
+        String username = userVO.getUsername();
+        String password = userVO.getPassword();
+        String confirmPassword = userVO.getConfirmPassword();
+
         return JSONResult.ok();
     }
 
