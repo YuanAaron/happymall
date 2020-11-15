@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import tk.mybatis.mapper.util.StringUtil;
 
 /**
  * Created by yw
@@ -38,11 +37,33 @@ public class PassportController {
     }
 
     @PostMapping("/register")
-    public JSONResult register(@RequestBody UserVO userVO) {
+    public JSONResult register(@RequestBody UserVO userVO) { //@ModelAttribute和@RequestBody区别
         String username = userVO.getUsername();
         String password = userVO.getPassword();
         String confirmPassword = userVO.getConfirmPassword();
 
+        //校验
+        //1、判断用户名和密码是否为空
+        if (StringUtils.isBlank(username) ||
+                StringUtils.isBlank(password) ||
+                StringUtils.isBlank(confirmPassword)) {
+            return JSONResult.errorMsg("用户名或密码不能为空");
+        }
+        //2、判断用户名是否已存在
+        boolean isExist = userService.queryUsernameIsExist(username);
+        if (isExist) {
+            return JSONResult.errorMsg("用户名已存在");
+        }
+        //3、密码长度不能少于6位
+        if (password.length()<6) {
+            return JSONResult.errorMsg("密码长度不能少于6");
+        }
+        //4、判断两次密码是否一致
+        if (!password.equals(confirmPassword)) {
+            return JSONResult.errorMsg("两次密码输入不一致");
+        }
+        //5、实现注册
+        userService.createUser(userVO);
         return JSONResult.ok();
     }
 
