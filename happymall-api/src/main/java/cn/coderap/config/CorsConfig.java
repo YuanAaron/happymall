@@ -18,7 +18,8 @@ public class CorsConfig {
     public CorsFilter corsFilter() {
         //1、添加cors配置信息
         CorsConfiguration config=new CorsConfiguration();
-        config.addAllowedOrigin("http://localhost:8080");
+        config.addAllowedOrigin("http://localhost:8080"); //在这里localhost和127.0.0.1不同，两个最好都添加上
+        config.addAllowedOrigin("http://127.0.0.1:8080");
         //设置是否发送cookie信息
         config.setAllowCredentials(true);
         //设置允许请求的方式，比如GET、POST等
