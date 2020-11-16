@@ -1,8 +1,10 @@
 package cn.coderap.controller;
 
+import cn.coderap.pojo.Users;
 import cn.coderap.pojo.bo.UserBO;
 import cn.coderap.service.UserService;
 import cn.coderap.utils.JSONResult;
+import cn.coderap.utils.MD5Utils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -67,6 +69,26 @@ public class PassportController {
         //5、实现注册
         userService.createUser(userBO);
         return JSONResult.ok();
+    }
+
+    @ApiOperation(value = "用户登陆",notes = "用户登陆",httpMethod = "POST")
+    @PostMapping("/login")
+    public JSONResult login(@RequestBody UserBO userBO) throws Exception {
+        String username = userBO.getUsername();
+        String password = userBO.getPassword();
+
+        //校验
+        //1、判断用户名和密码是否为空
+        if (StringUtils.isBlank(username) ||
+                StringUtils.isBlank(password)) {
+            return JSONResult.errorMsg("用户名或密码不能为空");
+        }
+        //2、实现登陆
+        Users userRes = userService.queryUserForLogin(username, MD5Utils.getMD5Str(password));
+        if (userRes==null) {
+            return JSONResult.errorMsg("用户名或密码不正确");
+        }
+        return JSONResult.ok(userRes);
     }
 
 }

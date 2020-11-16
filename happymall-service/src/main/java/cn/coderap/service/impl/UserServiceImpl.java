@@ -27,6 +27,7 @@ public class UserServiceImpl implements UserService {
 
     private static final String USER_FACE="http://122.152.205.72:88/group1/M00/00/05/CpoxxFw_8_qAIlFXAAAcIhVPdSg994.png";
 
+    @Transactional(propagation = Propagation.SUPPORTS)
     @Override
     public boolean queryUsernameIsExist(String username) {
         //Users对象映射为Example
@@ -61,5 +62,17 @@ public class UserServiceImpl implements UserService {
         user.setUpdatedTime(new Date());
         usersMapper.insert(user);
         return user;
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public Users queryUserForLogin(String username, String password) {
+        //Users对象映射为Example
+        Example userExample=new Example(Users.class);
+        Example.Criteria userCriteria = userExample.createCriteria();
+        userCriteria.andEqualTo("username", username);
+        userCriteria.andEqualTo("password", password);
+        Users res = usersMapper.selectOneByExample(userExample);
+        return res;
     }
 }
