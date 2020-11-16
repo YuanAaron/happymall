@@ -3,7 +3,7 @@ package cn.coderap.service.impl;
 import cn.coderap.enums.SexEnum;
 import cn.coderap.mapper.UsersMapper;
 import cn.coderap.pojo.Users;
-import cn.coderap.pojo.vo.UserVO;
+import cn.coderap.pojo.bo.UserBO;
 import cn.coderap.service.UserService;
 import cn.coderap.utils.DateUtil;
 import cn.coderap.utils.MD5Utils;
@@ -39,18 +39,18 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
-    public Users createUser(UserVO userVO) {
+    public Users createUser(UserBO userBO) {
         Users user=new Users();
         String id = sid.nextShort();
         user.setId(id);
-        user.setUsername(userVO.getUsername());
+        user.setUsername(userBO.getUsername());
         try {
-            user.setPassword(MD5Utils.getMD5Str(userVO.getPassword()));
+            user.setPassword(MD5Utils.getMD5Str(userBO.getPassword()));
         } catch (Exception e) {
             e.printStackTrace();
         }
         //用户昵称默认和用户名一致
-        user.setNickname(userVO.getUsername());
+        user.setNickname(userBO.getUsername());
         //默认头像
         user.setFace(USER_FACE);
         //默认生日

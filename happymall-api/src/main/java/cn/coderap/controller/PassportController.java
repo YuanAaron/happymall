@@ -1,19 +1,19 @@
-package cn.coderap.cn.coderap.controller;
+package cn.coderap.controller;
 
-import cn.coderap.pojo.vo.UserVO;
-import cn.coderap.service.StuServcie;
+import cn.coderap.pojo.bo.UserBO;
 import cn.coderap.service.UserService;
 import cn.coderap.utils.JSONResult;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * Created by yw
  * 2020/11/9
  */
+@Api(value = "注册登录",tags = {"用于注册登录的相关接口"})
 @RestController
 @RequestMapping("/passport")
 public class PassportController {
@@ -21,6 +21,7 @@ public class PassportController {
     @Autowired
     private UserService userService;
 
+    @ApiOperation(value = "用户名是否存在",notes = "用户名是否存在",httpMethod = "GET")
     @GetMapping("/usernameIsExist")
     public JSONResult usernameIsExist(@RequestParam String username) {
         //1、用户名不能为空
@@ -36,11 +37,12 @@ public class PassportController {
         return JSONResult.ok();
     }
 
+    @ApiOperation(value = "用户注册",notes = "用户注册",httpMethod = "POST")
     @PostMapping("/register")
-    public JSONResult register(@RequestBody UserVO userVO) { //TODO @ModelAttribute和@RequestBody区别
-        String username = userVO.getUsername();
-        String password = userVO.getPassword();
-        String confirmPassword = userVO.getConfirmPassword();
+    public JSONResult register(@RequestBody UserBO userBO) { //TODO @ModelAttribute和@RequestBody区别
+        String username = userBO.getUsername();
+        String password = userBO.getPassword();
+        String confirmPassword = userBO.getConfirmPassword();
 
         //校验
         //1、判断用户名和密码是否为空
@@ -63,7 +65,7 @@ public class PassportController {
             return JSONResult.errorMsg("两次密码输入不一致");
         }
         //5、实现注册
-        userService.createUser(userVO);
+        userService.createUser(userBO);
         return JSONResult.ok();
     }
 

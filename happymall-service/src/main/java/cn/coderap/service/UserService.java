@@ -1,7 +1,7 @@
 package cn.coderap.service;
 
 import cn.coderap.pojo.Users;
-import cn.coderap.pojo.vo.UserVO;
+import cn.coderap.pojo.bo.UserBO;
 
 public interface UserService {
 
@@ -13,5 +13,5 @@ public interface UserService {
     /**
      * 注册用户
      */
-    public Users createUser(UserVO userVO);
+    public Users createUser(UserBO userBO);
 }
