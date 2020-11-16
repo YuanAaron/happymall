@@ -59,11 +59,11 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
-        <!--mysql驱动-->
+        <!--mysql驱动：5.7使用5.1.41，8.0使用8.0.18-->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.18</version>
+            <version>5.1.41</version>
         </dependency>
         <!--mybatis-->
         <dependency>

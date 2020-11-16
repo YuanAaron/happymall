@@ -22,7 +22,7 @@ public class PassportController {
     private UserService userService;
 
     @GetMapping("/usernameIsExist")
-    public JSONResult usernameIsExist(@RequestParam("username") String username) {
+    public JSONResult usernameIsExist(@RequestParam String username) {
         //1、用户名不能为空
         if (StringUtils.isBlank(username)) {
             return JSONResult.errorMsg("用户名不能为空");
@@ -37,7 +37,7 @@ public class PassportController {
     }
 
     @PostMapping("/register")
-    public JSONResult register(@RequestBody UserVO userVO) { //@ModelAttribute和@RequestBody区别
+    public JSONResult register(@RequestBody UserVO userVO) { //TODO @ModelAttribute和@RequestBody区别
         String username = userVO.getUsername();
         String password = userVO.getPassword();
         String confirmPassword = userVO.getConfirmPassword();
