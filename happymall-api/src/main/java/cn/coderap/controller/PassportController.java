@@ -3,13 +3,18 @@ package cn.coderap.controller;
 import cn.coderap.pojo.Users;
 import cn.coderap.pojo.bo.UserBO;
 import cn.coderap.service.UserService;
+import cn.coderap.utils.CookieUtils;
 import cn.coderap.utils.JSONResult;
+import cn.coderap.utils.JsonUtils;
 import cn.coderap.utils.MD5Utils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Created by yw
@@ -73,7 +78,9 @@ public class PassportController {
 
     @ApiOperation(value = "用户登陆",notes = "用户登陆",httpMethod = "POST")
     @PostMapping("/login")
-    public JSONResult login(@RequestBody UserBO userBO) throws Exception {
+    public JSONResult login(@RequestBody UserBO userBO,
+                            HttpServletRequest request,
+                            HttpServletResponse response) throws Exception {
         String username = userBO.getUsername();
         String password = userBO.getPassword();
 
@@ -88,7 +95,27 @@ public class PassportController {
         if (userRes==null) {
             return JSONResult.errorMsg("用户名或密码不正确");
         }
+        //学习京东：先登录，然后清除cookie(检查-Application-Cookies-https://www.jd.com-右键-clear)，刷新京东首页，发现需要再次登录，
+        //证明在你登录后，京东将一些用户信息加密后放在cookie中，本项目也通过这种方式实现。
+
+        //登录后，直接将userRes放到cookie中，但需要去除一部分敏感信息，比如password、realname等，一种方法是在Users的这些属性上使用
+        //@JsonIgnore注解，这样当把这个实体类封装为JsonObject返回给前端时，不会显示这些属性（缺点：要修改从数据库逆向生成的原始实体
+        //类，不建议）；方法二：在此处将这些属性直接设置为null
+        userRes=setNullProperty(userRes);
+        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(userRes),true);
         return JSONResult.ok(userRes);
+    }
+
+    private Users setNullProperty(Users userRes) {
+        userRes.setPassword(null);
+        userRes.setRealname(null);
+        userRes.setMobile(null);
+        userRes.setEmail(null);
+        userRes.setSex(null);
+        userRes.setBirthday(null);
+        userRes.setCreatedTime(null);
+        userRes.setUpdatedTime(null);
+        return userRes;
     }
 
 }
