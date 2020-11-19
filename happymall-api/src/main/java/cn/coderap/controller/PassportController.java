@@ -122,4 +122,19 @@ public class PassportController {
         return userRes;
     }
 
+    @ApiOperation(value = "用户退出登陆",notes = "用户退出登陆",httpMethod = "POST")
+    @PostMapping("/logout")
+    public JSONResult logout(@RequestParam String userId,
+                             HttpServletRequest request,
+                             HttpServletResponse response) {
+        //清除用户信息相关的cookie
+        CookieUtils.deleteCookie(request,response,"user");
+
+        //后续
+        //TODO 用户退出登录时，需要清空购物车（不是很懂）
+        //TODO 在分布式会话中，需要清除用户数据（不是很懂）
+
+        return JSONResult.ok();
+    }
+
 }
