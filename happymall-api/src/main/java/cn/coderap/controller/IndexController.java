@@ -2,7 +2,9 @@ package cn.coderap.controller;
 
 import cn.coderap.enums.YesOrNoEnum;
 import cn.coderap.pojo.Carousel;
+import cn.coderap.pojo.Category;
 import cn.coderap.service.CarouselService;
+import cn.coderap.service.CategoryService;
 import cn.coderap.utils.JSONResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,6 +27,9 @@ public class IndexController {
     @Autowired
     private CarouselService carouselService;
 
+    @Autowired
+    private CategoryService categoryService;
+
     @ApiOperation(value = "获取首页轮播图列表",notes = "获取首页轮播图列表",httpMethod = "GET")
     @GetMapping("/carousel")
     public JSONResult carousel() {
@@ -37,4 +42,11 @@ public class IndexController {
      * 1、刷新首页时只获取一级大分类，并渲染展示在首页；
      * 2、当鼠标移动到一级大分类上，才加载其子分类的内容（懒加载）；如果已经存在子分类（鼠标已经到该分类过），则不再加载其子分类内容。
      */
+
+    @ApiOperation(value = "获取商品分类（一级分类）",notes = "获取商品分类（一级分类）",httpMethod = "GET")
+    @GetMapping("/cats")
+    public JSONResult cats() {
+        List<Category> categoryList = categoryService.queryAllRootCategory();
+        return JSONResult.ok(categoryList);
+    }
 }
