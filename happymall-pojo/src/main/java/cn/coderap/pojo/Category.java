@@ -16,7 +16,7 @@ public class Category {
     private String name;
 
     /**
-     * 分类类型
+     * 分类类型 1：一级大分类，2：二级分类，3：三级小分类
      */
     private Integer type;
 
