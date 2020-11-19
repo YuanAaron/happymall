@@ -41,6 +41,13 @@ public class UserServiceImpl implements UserService {
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public Users createUser(UserBO userBO) {
+        //用于监控每个service执行时间功能的测试
+//        try {
+//            Thread.sleep(3500);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+
         Users user=new Users();
         String id = sid.nextShort();
         user.setId(id);
@@ -67,6 +74,13 @@ public class UserServiceImpl implements UserService {
     @Transactional(propagation = Propagation.SUPPORTS)
     @Override
     public Users queryUserForLogin(String username, String password) {
+        //用于监控每个service执行时间功能的测试
+//        try {
+//            Thread.sleep(2500);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+
         //Users对象映射为Example
         Example userExample=new Example(Users.class);
         Example.Criteria userCriteria = userExample.createCriteria();
