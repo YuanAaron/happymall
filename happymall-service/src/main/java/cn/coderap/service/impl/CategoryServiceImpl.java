@@ -23,6 +23,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private CategoryMapperCustom categoryMapperCustom;
 
+    @Transactional(propagation = Propagation.SUPPORTS)
     @Override
     public List<Category> queryAllRootCategory() {
         Example categoryExample=new Example(Category.class);
