@@ -2,6 +2,7 @@ package cn.coderap.service;
 
 import cn.coderap.pojo.Category;
 import cn.coderap.pojo.vo.CategoryVO;
+import cn.coderap.pojo.vo.NewItemsVO;
 
 import java.util.List;
 
@@ -19,4 +20,11 @@ public interface CategoryService {
      * @return
      */
     public List<CategoryVO> getSubCategoryList(Integer rootCategoryId);
+
+    /**
+     * 根据一级大分类的rootCategoryId获取其6条最新的商品数据
+     * @param rootCategoryId
+     * @return
+     */
+    public List<NewItemsVO> lazyGetSixNewItems(Integer rootCategoryId);
 }

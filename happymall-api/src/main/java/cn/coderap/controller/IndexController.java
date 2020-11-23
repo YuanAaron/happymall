@@ -4,6 +4,7 @@ import cn.coderap.enums.YesOrNoEnum;
 import cn.coderap.pojo.Carousel;
 import cn.coderap.pojo.Category;
 import cn.coderap.pojo.vo.CategoryVO;
+import cn.coderap.pojo.vo.NewItemsVO;
 import cn.coderap.service.CarouselService;
 import cn.coderap.service.CategoryService;
 import cn.coderap.utils.JSONResult;
@@ -63,4 +64,16 @@ public class IndexController {
         List<CategoryVO> categoryVOList = categoryService.getSubCategoryList(rootCategoryId);
         return JSONResult.ok(categoryVOList);
     }
+
+    @ApiOperation(value = "获取每个一级大分类下的最新6条商品数据",notes = "获取每个一级大分类下的最新6条商品数据",httpMethod = "GET")
+    @GetMapping("/sixNewItems/{rootCatId}")
+    public JSONResult sixNewItems(@ApiParam(name = "rootCatId",value ="一级大分类id",required = true)
+                             @PathVariable("rootCatId") Integer rootCategoryId) {
+        if (rootCategoryId==null) {
+            return JSONResult.errorMsg("分类不存在");
+        }
+        List<NewItemsVO> newItemsVOList = categoryService.lazyGetSixNewItems(rootCategoryId);
+        return JSONResult.ok(newItemsVOList);
+    }
+
 }

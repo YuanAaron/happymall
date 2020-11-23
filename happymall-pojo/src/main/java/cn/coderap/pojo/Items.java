@@ -18,7 +18,7 @@ public class Items {
     private String itemName;
 
     /**
-     * 分类外键id 分类id
+     * 分类外键id 分类id(三级小分类id)
      */
     @Column(name = "cat_id")
     private Integer catId;

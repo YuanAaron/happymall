@@ -20,7 +20,7 @@
   </resultMap>
 
   <!--根据一级大分类的rootCategoryId自连接查询二级分类及其对应的三级小分类（重点！！！）-->
-  <select id="getSubCategoryList" resultMap="categoryVOMap" parameterType="int">
+  <select id="getSubCategoryList" resultMap="categoryVOMap" parameterType="java.lang.Integer">
     SELECT
         f.id as id,
         f.name as name,
@@ -39,4 +39,45 @@
     WHERE
         f.father_id= #{rootCategoryId}
   </select>
+
+    <resultMap id="newItemsVO" type="cn.coderap.pojo.vo.NewItemsVO">
+        <id column="rootCategoryId" property="rootCategoryId" />
+        <result column="rootCategoryName" property="rootCategoryName" />
+        <result column="slogan" property="slogan" />
+        <result column="bgColor" property="bgColor" />
+        <result column="categoryImage" property="categoryImage" />
+
+        <collection property="simpleItemList" ofType="cn.coderap.pojo.vo.SimpleItemVO">
+            <id column="itemId" property="itemId" />
+            <result column="itemName" property="itemName" />
+            <result column="itemUrl" property="itemUrl" />
+        </collection>
+    </resultMap>
+
+    <!--根据一级大分类的rootCategoryId获取其6条最新的商品数据-->
+    <select id="lazyGetSixNewItems" resultMap="newItemsVO" parameterType="java.util.Map">
+        SELECT
+            f.id AS rootCategoryId,
+            f.name AS rootCategoryName,
+            f.slogan AS slogan,
+            f.bg_color AS bgColor,
+            f.cat_image as categoryImage,
+            i.id AS itemId,
+            i.item_name AS itemName,
+            ii.url AS itemUrl
+        FROM
+            category f
+        LEFT JOIN items i ON f.id=i.root_cat_id
+        LEFT JOIN items_img ii ON i.id=ii.item_id
+        WHERE
+            f.type=1
+        AND
+            i.root_cat_id=#{paramsMap.rootCategoryId}
+        AND
+            ii.is_main=1
+        ORDER BY
+            i.created_time
+        DESC
+        LIMIT 0,6
+    </select>
 </mapper>
