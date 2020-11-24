@@ -4,6 +4,7 @@ import cn.coderap.pojo.Items;
 import cn.coderap.pojo.ItemsImg;
 import cn.coderap.pojo.ItemsParam;
 import cn.coderap.pojo.ItemsSpec;
+import cn.coderap.pojo.vo.CommentLevelCountVO;
 
 import java.util.List;
 
@@ -36,5 +37,11 @@ public interface ItemService {
      * @return
      */
     public ItemsParam getItemParam(String itemId);
+
+    /**
+     * 根据商品id查询不同评级等级的数量
+     * @param itemId
+     */
+    public CommentLevelCountVO queryCommentCount(String itemId);
 
 }
