@@ -62,6 +62,6 @@ public class ItemServiceImpl implements ItemService {
         Example itemsParamExample=new Example(ItemsParam.class);
         Example.Criteria criteria = itemsParamExample.createCriteria();
         criteria.andEqualTo("itemId",itemId);
-        return itemsParamMapper.selectOneByExample(itemId);
+        return itemsParamMapper.selectOneByExample(itemsParamExample);
     }
 }
