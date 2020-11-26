@@ -5,7 +5,6 @@ import cn.coderap.pojo.ItemsImg;
 import cn.coderap.pojo.ItemsParam;
 import cn.coderap.pojo.ItemsSpec;
 import cn.coderap.pojo.vo.CommentLevelCountVO;
-import cn.coderap.pojo.vo.ItemCommentVO;
 import cn.coderap.utils.PagedGridResult;
 
 import java.util.List;
@@ -53,5 +52,15 @@ public interface ItemService {
      * @return
      */
     public PagedGridResult queryPagedComments(String itemId, Integer level, Integer page, Integer pageSize);
+
+    /**
+     * 搜索商品列表
+     * @param keywords
+     * @param sort
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    public PagedGridResult searchItems(String keywords, String sort, Integer page, Integer pageSize);
 
 }
