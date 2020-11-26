@@ -1,18 +1,15 @@
 package cn.coderap.controller;
 
-import cn.coderap.enums.YesOrNoEnum;
 import cn.coderap.pojo.*;
-import cn.coderap.pojo.vo.CategoryVO;
 import cn.coderap.pojo.vo.CommentLevelCountVO;
 import cn.coderap.pojo.vo.ItemInfoVO;
-import cn.coderap.pojo.vo.NewItemsVO;
 import cn.coderap.service.ItemService;
 import cn.coderap.utils.JSONResult;
+import cn.coderap.utils.PagedGridResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +22,7 @@ import java.util.List;
 @Api(value = "商品",tags = {"用于商品信息展示的相关接口"})
 @RestController
 @RequestMapping("/items")
-public class ItemsController {
+public class ItemsController extends BaseController{
 
     @Autowired
     private ItemService itemService;
@@ -62,6 +59,33 @@ public class ItemsController {
         }
         CommentLevelCountVO commentLevelCountVO = itemService.queryCommentCount(itemId);
         return JSONResult.ok(commentLevelCountVO);
+    }
+
+    @ApiOperation(value = "查询商品评价内容",notes = "查询商品评价内容",httpMethod = "GET")
+    @GetMapping("/comments")
+    public JSONResult comments(
+            @ApiParam(name = "itemId",value ="商品id",required = true)
+            @RequestParam String itemId,
+            @ApiParam(name = "level",value ="评价等级",required = false)
+            @RequestParam Integer level,
+            @ApiParam(name = "page",value ="当前页数",required = false)
+            @RequestParam Integer page,
+            @ApiParam(name = "pageSize",value ="每页显示条数",required = false)
+            @RequestParam Integer pageSize) {
+
+        if (StringUtils.isBlank(itemId)) {
+            return JSONResult.errorMsg("商品不存在"); //null
+        }
+
+        if (page==null) {
+            page=1;
+        }
+
+        if (pageSize==null) {
+            pageSize=COMMENT_PAGE_SIZE;
+        }
+        PagedGridResult grid = itemService.queryPagedComments(itemId, level, page, pageSize);
+        return JSONResult.ok(grid);
     }
 
 }

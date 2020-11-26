@@ -4,14 +4,20 @@ import cn.coderap.enums.CommentLevelEnum;
 import cn.coderap.mapper.*;
 import cn.coderap.pojo.*;
 import cn.coderap.pojo.vo.CommentLevelCountVO;
+import cn.coderap.pojo.vo.ItemCommentVO;
 import cn.coderap.service.ItemService;
+import cn.coderap.utils.PagedGridResult;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -30,6 +36,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Autowired
     private ItemsCommentsMapper itemsCommentsMapper;
+
+    @Autowired
+    private ItemsMapperCustom itemsMapperCustom;
 
     @Transactional(propagation = Propagation.SUPPORTS)
     @Override
@@ -88,5 +97,34 @@ public class ItemServiceImpl implements ItemService {
             condition.setCommentLevel(level);
         }
         return itemsCommentsMapper.selectCount(condition);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public PagedGridResult queryPagedComments(String itemId,
+                                                  Integer level,
+                                                  Integer page,
+                                                  Integer pageSize) {
+        Map<String,Object> map=new HashMap<>();
+        map.put("itemId", itemId);
+        map.put("level", level);
+
+        //分页插件的使用
+        //1、在查询之前使用分页插件，原理：统一拦截sql，拼接一些sql片段，为预设的sql提供分页功能
+        // page: 第几页；pageSize：每页显示条数
+        PageHelper.startPage(page, pageSize);
+        List<ItemCommentVO> itemCommentVOList = itemsMapperCustom.queryItemComments(map); //itemCommentVOList为分页后的数据
+        //2、分页数据封装到PagedGridResult传给前端
+        return setterPagedGrid(itemCommentVOList, page);
+    }
+
+    private PagedGridResult setterPagedGrid(List<?> list,Integer page) {
+        PageInfo<?> pageList=new PageInfo<>(list);
+        PagedGridResult grid = new PagedGridResult();
+        grid.setPage(page);
+        grid.setRows(list);
+        grid.setTotal(pageList.getPages());
+        grid.setRecords(pageList.getTotal());
+        return grid;
     }
 }
