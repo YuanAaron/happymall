@@ -6,6 +6,7 @@ import cn.coderap.pojo.*;
 import cn.coderap.pojo.vo.CommentLevelCountVO;
 import cn.coderap.pojo.vo.ItemCommentVO;
 import cn.coderap.service.ItemService;
+import cn.coderap.utils.DesensitizationUtil;
 import cn.coderap.utils.PagedGridResult;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -114,6 +115,10 @@ public class ItemServiceImpl implements ItemService {
         // page: 第几页；pageSize：每页显示条数
         PageHelper.startPage(page, pageSize);
         List<ItemCommentVO> itemCommentVOList = itemsMapperCustom.queryItemComments(map); //itemCommentVOList为分页后的数据
+        //商品评价时昵称脱敏
+        for (ItemCommentVO vo : itemCommentVOList) {
+            vo.setNickname(DesensitizationUtil.commonDisplay(vo.getNickname()));
+        }
         //2、分页数据封装到PagedGridResult传给前端
         return setterPagedGrid(itemCommentVOList, page);
     }
