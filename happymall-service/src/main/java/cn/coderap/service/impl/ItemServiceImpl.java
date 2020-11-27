@@ -5,6 +5,7 @@ import cn.coderap.mapper.*;
 import cn.coderap.pojo.*;
 import cn.coderap.pojo.vo.CommentLevelCountVO;
 import cn.coderap.pojo.vo.ItemCommentVO;
+import cn.coderap.pojo.vo.SearchItemsVO;
 import cn.coderap.service.ItemService;
 import cn.coderap.utils.DesensitizationUtil;
 import cn.coderap.utils.PagedGridResult;
@@ -133,8 +134,16 @@ public class ItemServiceImpl implements ItemService {
         return grid;
     }
 
+    @Transactional(propagation = Propagation.SUPPORTS)
     @Override
     public PagedGridResult searchItems(String keywords, String sort, Integer page, Integer pageSize) {
-        return null;
+        Map<String,Object> map=new HashMap<>();
+        map.put("keywords", keywords);
+        map.put("sort", sort);
+
+        //分页
+        PageHelper.startPage(page, pageSize);
+        List<SearchItemsVO> searchItemsVOList = itemsMapperCustom.searchItems(map);
+        return setterPagedGrid(searchItemsVOList, page);
     }
 }

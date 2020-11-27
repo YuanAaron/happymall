@@ -53,10 +53,10 @@
                 count: 根据销量进行排序
                 price: 根据价格进行排序
                 -->
-                <when test="paramsMap.sort =='c' ">
+                <when test="paramsMap.sort ==&quot;c&quot; ">
                     i.sell_counts desc
                 </when>
-                <when test="paramsMap.sort =='p' ">
+                <when test="paramsMap.sort ==&quot;p&quot; ">
                     t.price_discount asc
                 </when>
                 <otherwise>

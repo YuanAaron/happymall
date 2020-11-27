@@ -88,4 +88,33 @@ public class ItemsController extends BaseController{
         return JSONResult.ok(grid);
     }
 
+    @ApiOperation(value = "搜索商品列表",notes = "搜索商品列表",httpMethod = "GET")
+    @GetMapping("/search")
+    public JSONResult search(
+            @ApiParam(name = "keywords",value ="关键字",required = true)
+            @RequestParam String keywords,
+            @ApiParam(name = "sort",value ="排序",required = false)
+            @RequestParam String sort,
+            @ApiParam(name = "page",value ="当前页数",required = false)
+            @RequestParam Integer page,
+            @ApiParam(name = "pageSize",value ="每页显示条数",required = false)
+            @RequestParam Integer pageSize) {
+
+        //有该段代码：当没有关键词时，不去搜索；
+        //没有该段代码：如果前端没有做空校验，当没有关键词时，搜索出所有内容
+        if (StringUtils.isBlank(keywords)) {
+            return JSONResult.errorMsg("null");
+        }
+
+        if (page==null) {
+            page=1;
+        }
+
+        if (pageSize==null) {
+            pageSize=PAGE_SIZE;
+        }
+        PagedGridResult grid = itemService.searchItems(keywords, sort, page, pageSize);
+        return JSONResult.ok(grid);
+    }
+
 }

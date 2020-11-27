@@ -7,18 +7,18 @@ package cn.coderap.pojo.vo;
  */
 public class SearchItemsVO {
 
-    private Integer itemId;
+    private String itemId;
     private String itemName;
     private Integer sellCounts;
     private String imgUrl;
     //数据库中的价格都是以分为单位进行保存的，前端会除以100进行转换
     private Integer price;
 
-    public Integer getItemId() {
+    public String getItemId() {
         return itemId;
     }
 
-    public void setItemId(Integer itemId) {
+    public void setItemId(String itemId) {
         this.itemId = itemId;
     }
 
