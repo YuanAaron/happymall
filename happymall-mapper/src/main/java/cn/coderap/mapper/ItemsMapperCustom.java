@@ -2,6 +2,7 @@ package cn.coderap.mapper;
 
 import cn.coderap.pojo.vo.ItemCommentVO;
 import cn.coderap.pojo.vo.SearchItemsVO;
+import cn.coderap.pojo.vo.ShopcartItemVO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -18,4 +19,6 @@ public interface ItemsMapperCustom {
     public List<SearchItemsVO> searchItems(@Param("paramsMap") Map<String,Object> map);
 
     public List<SearchItemsVO> searchItemsByThirdCat(@Param("paramsMap") Map<String,Object> map);
+
+    public List<ShopcartItemVO> queryItemsBySpecIds(@Param("paramsList") List<String> list);
 }

@@ -104,4 +104,32 @@
             </otherwise>
         </choose>
     </select>
+
+    <!--根据规格id查询商品数据，用以刷新购物车中的商品数据，比如价格变化-->
+    <select id="queryItemsBySpecIds" parameterType="java.util.List" resultType="cn.coderap.pojo.vo.ShopcartItemVO">
+        SELECT
+            i.id AS itemId,
+            i.item_name AS itemName,
+          ii.url AS itemImgUrl,
+            ip.id AS specId,
+            ip.name AS specName,
+            ip.price_discount AS priceDiscount,
+            ip.price_normal AS priceNormal
+        FROM
+            items_spec ip
+        LEFT JOIN
+            items i
+        ON
+            ip.item_id=i.id
+        LEFT JOIN
+            items_img ii
+        ON
+            ip.item_id=i.id
+        WHERE
+            ii.is_main=1
+        AND ip.id IN
+            <foreach collection="paramsList"  item="specId" open="(" separator="," close=")">
+                #{specId}
+            </foreach>
+    </select>
 </mapper>
