@@ -77,6 +77,10 @@ public class PassportController {
         Users userRes=userService.createUser(userBO);
         userRes=setNullProperty(userRes);
         CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(userRes),true);
+
+        //TODO 在分布式会话中，生成用户token，存入redis会话
+        //TODO 在分布式会话中，同步购物车数据
+
         return JSONResult.ok();
     }
 
@@ -107,6 +111,10 @@ public class PassportController {
         //类，不建议）；方法二：在此处将这些属性直接设置为null
         userRes=setNullProperty(userRes);
         CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(userRes),true);
+
+        //TODO 在分布式会话中，生成用户token，存入redis会话
+        //TODO 在分布式会话中，同步购物车数据
+
         return JSONResult.ok(userRes);
     }
 
