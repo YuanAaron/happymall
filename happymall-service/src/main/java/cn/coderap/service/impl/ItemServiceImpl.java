@@ -6,6 +6,7 @@ import cn.coderap.pojo.*;
 import cn.coderap.pojo.vo.CommentLevelCountVO;
 import cn.coderap.pojo.vo.ItemCommentVO;
 import cn.coderap.pojo.vo.SearchItemsVO;
+import cn.coderap.pojo.vo.ShopcartItemVO;
 import cn.coderap.service.ItemService;
 import cn.coderap.utils.DesensitizationUtil;
 import cn.coderap.utils.PagedGridResult;
@@ -17,9 +18,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -158,5 +157,15 @@ public class ItemServiceImpl implements ItemService {
         PageHelper.startPage(page, pageSize);
         List<SearchItemsVO> searchItemsVOList = itemsMapperCustom.searchItemsByThirdCat(map);
         return setterPagedGrid(searchItemsVOList, page);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public List<ShopcartItemVO> queryItemsBySpecIds(String specIds) {
+        String[] ids = specIds.split(",");
+        return itemsMapperCustom.queryItemsBySpecIds(Arrays.asList(ids)); //Arrays.asList()将string[] 转化为 List<String>
+//        List<String> list=new ArrayList<>();
+//        Collections.addAll(list, ids); //Collections.addAll()将String[] 添加到 List<String>
+//        return itemsMapperCustom.queryItemsBySpecIds(list);
     }
 }

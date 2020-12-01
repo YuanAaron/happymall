@@ -5,6 +5,7 @@ import cn.coderap.pojo.ItemsImg;
 import cn.coderap.pojo.ItemsParam;
 import cn.coderap.pojo.ItemsSpec;
 import cn.coderap.pojo.vo.CommentLevelCountVO;
+import cn.coderap.pojo.vo.ShopcartItemVO;
 import cn.coderap.utils.PagedGridResult;
 
 import java.util.List;
@@ -72,5 +73,12 @@ public interface ItemService {
      * @return
      */
     public PagedGridResult searchItems(Integer catId, String sort, Integer page, Integer pageSize);
+
+    /**
+     * 根据规格ids(拼接)查询最新的购物车中的商品数据(刷新购物车中的商品数据)
+     * @param specIds 拼接的规格id
+     * @return
+     */
+    public List<ShopcartItemVO> queryItemsBySpecIds(String specIds);
 
 }
