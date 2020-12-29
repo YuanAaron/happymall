@@ -110,7 +110,7 @@
         SELECT
             i.id AS itemId,
             i.item_name AS itemName,
-          ii.url AS itemImgUrl,
+            ii.url AS itemImgUrl,
             ip.id AS specId,
             ip.name AS specName,
             ip.price_discount AS priceDiscount,
@@ -124,11 +124,11 @@
         LEFT JOIN
             items_img ii
         ON
-            ip.item_id=i.id
+            ii.item_id=i.id
         WHERE
             ii.is_main=1
         AND ip.id IN
-            <foreach collection="paramsList"  item="specId" open="(" separator="," close=")">
+            <foreach collection="paramsList"  index="index" item="specId" open="(" separator="," close=")">
                 #{specId}
             </foreach>
     </select>
