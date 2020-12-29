@@ -48,4 +48,24 @@ public class ShopcartController {
         return JSONResult.ok();
     }
 
+    @ApiOperation(value = "从购物车中删除商品",notes = "从购物车中删除商品",httpMethod = "POST")
+    @PostMapping("/del")
+    public JSONResult del(
+            @ApiParam(name = "userId",value ="用户id",required = true)
+            @RequestParam String userId,
+            @ApiParam(name = "商品规格id",value ="商品规格id",required = true)
+            @RequestParam String itemSpecId,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+
+        if (StringUtils.isBlank(userId) || StringUtils.isBlank(itemSpecId)) {
+            return JSONResult.errorMsg("参数不能为空");
+        }
+
+        //TODO 删除购物车中的商品分为登录、未登录两种情况，未登录时只需删除cookie购物车中的对应商品（前端实现），
+        // 已登录时，不仅要删除cookie购物车中的对应商品（前端实现），同时后端同步删除redis购物车中的对应商品
+
+        return JSONResult.ok();
+    }
+
 }
