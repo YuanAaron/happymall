@@ -132,4 +132,16 @@
                 #{specId}
             </foreach>
     </select>
+
+    <!--扣减库存：关键在于stock>=buyCounts-->
+    <update id="decreaseItemSpecStock">
+        UPDATE
+            items_spec
+        SET
+            stock = stock - #{buyCounts}
+        WHERE
+            id = #{specId}
+        AND
+            stock >= #{buyCounts}
+    </update>
 </mapper>

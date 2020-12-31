@@ -33,4 +33,9 @@ public interface AddressService {
      * 设置默认用户收货地址
      */
     public void updateUserAddressToBeDefault(String userId,String addressId);
+
+    /**
+     * 根据userId和addressId查询用户地址对象
+     */
+    public UserAddress queryUserAddress(String userId, String addressId);
 }

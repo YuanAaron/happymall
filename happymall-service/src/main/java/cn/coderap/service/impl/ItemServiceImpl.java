@@ -1,6 +1,7 @@
 package cn.coderap.service.impl;
 
 import cn.coderap.enums.CommentLevelEnum;
+import cn.coderap.enums.YesOrNoEnum;
 import cn.coderap.mapper.*;
 import cn.coderap.pojo.*;
 import cn.coderap.pojo.vo.CommentLevelCountVO;
@@ -167,5 +168,48 @@ public class ItemServiceImpl implements ItemService {
 //        List<String> list=new ArrayList<>();
 //        Collections.addAll(list, ids); //Collections.addAll()将String[] 添加到 List<String>
 //        return itemsMapperCustom.queryItemsBySpecIds(list);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public ItemsSpec queryItemsSpecById(String id) {
+        return itemsSpecMapper.selectByPrimaryKey(id);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public String queryItemMainImgByItemId(String itemId) {
+        ItemsImg itemsImg = new ItemsImg();
+        itemsImg.setItemId(itemId);
+        itemsImg.setIsMain(YesOrNoEnum.YES.type);
+        ItemsImg res = itemsImgMapper.selectOne(itemsImg);
+        return res == null ? "" : res.getUrl();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public void decreaseItemSpecStock(String specId, int buyCounts) {
+
+        // 当前方法上加synchronized，不推荐使用，性能低下；集群下无用
+        // 锁数据库：不推荐，导致数据库性能低下
+        // 分布式锁：集群和分布式环境可用 //TODO zookeeper和redis都可以实现lockUtil
+        // 乐观锁：本项目的实现方式，由于当前方法使用了事务，抛出异常会导致事务回滚
+
+        //不考虑并发导致超卖的示例及并发下分布式锁的解决方案
+//        lockUtil.getLock(); //加锁
+        //1、查询库存
+//        int stock = 10;
+        //2、判断库存，是否会减少到0以下
+//        if (stock - buyCounts < 0) {
+            //提示用户库存不够
+            //10 - 3 -3 -5 = -1
+//        }
+//        lockUtil.unLock(); //解锁
+
+        //乐观锁做法
+        int res = itemsMapperCustom.decreaseItemSpecStock(specId, buyCounts);
+        if (res != 1) {
+            throw new RuntimeException("库存不足，订单创建失败");
+        }
     }
 }
