@@ -193,7 +193,8 @@ public class ItemServiceImpl implements ItemService {
         // 当前方法上加synchronized，不推荐使用，性能低下；集群下无用
         // 锁数据库：不推荐，导致数据库性能低下
         // 分布式锁：集群和分布式环境可用 //TODO zookeeper和redis都可以实现lockUtil
-        // 乐观锁：本项目的实现方式，由于当前方法使用了事务，抛出异常会导致事务回滚
+        // 乐观锁：本项目的实现方式，由于当前方法使用了事务，抛出异常会导致事务回滚，具体指itemServiceImpl中抛出了异常，只要在
+        // orderServiceImpl中没有catch异常，那么decreaseItemSpecStock和createOrder两个方法中的操作都会回滚
 
         //不考虑并发导致超卖的示例及并发下分布式锁的解决方案
 //        lockUtil.getLock(); //加锁
