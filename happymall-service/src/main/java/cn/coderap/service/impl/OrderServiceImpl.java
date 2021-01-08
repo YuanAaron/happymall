@@ -7,6 +7,8 @@ import cn.coderap.mapper.OrderStatusMapper;
 import cn.coderap.mapper.OrdersMapper;
 import cn.coderap.pojo.*;
 import cn.coderap.pojo.bo.SubmitOrderBO;
+import cn.coderap.pojo.vo.MerchantOrdersVO;
+import cn.coderap.pojo.vo.OrdersVO;
 import cn.coderap.service.AddressService;
 import cn.coderap.service.ItemService;
 import cn.coderap.service.OrderService;
@@ -36,7 +38,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
-    public void createOrder(SubmitOrderBO submitOrderBO) {
+    public OrdersVO createOrder(SubmitOrderBO submitOrderBO) {
         String userId = submitOrderBO.getUserId();
         String addressId = submitOrderBO.getAddressId();
         String itemSpecIds = submitOrderBO.getItemSpecIds();
@@ -108,5 +110,33 @@ public class OrderServiceImpl implements OrderService {
         waitPayOrderStatus.setOrderStatus(OrderStatusEnum.WAIT_PAY.type);
         waitPayOrderStatus.setCreatedTime(new Date());
         orderStatusMapper.insert(waitPayOrderStatus);
+
+        //4、构建商户订单VO，用于传给支付中心的BO
+        MerchantOrdersVO merchantOrdersVO = new MerchantOrdersVO();
+        merchantOrdersVO.setMerchantOrderId(orderId);
+        merchantOrdersVO.setMerchantUserId(userId);
+        merchantOrdersVO.setPayMethod(payMethod);
+        merchantOrdersVO.setAmount(realPayAmount + postAmount);
+
+        OrdersVO ordersVO = new OrdersVO();
+        ordersVO.setOrderId(orderId);
+        ordersVO.setMerchantOrdersVO(merchantOrdersVO);
+        return ordersVO;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public void updateOrderStatus(String orderId, Integer orderStatus) {
+        OrderStatus paidStatus = new OrderStatus();
+        paidStatus.setOrderId(orderId);
+        paidStatus.setOrderStatus(orderStatus);
+        paidStatus.setPayTime(new Date());
+        orderStatusMapper.updateByPrimaryKeySelective(paidStatus);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public OrderStatus queryOrderStatusInfo(String orderId) {
+        return orderStatusMapper.selectByPrimaryKey(orderId);
     }
 }
