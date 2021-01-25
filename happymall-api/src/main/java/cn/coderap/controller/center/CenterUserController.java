@@ -1,5 +1,6 @@
 package cn.coderap.controller.center;
 
+import cn.coderap.config.center.FileUpload;
 import cn.coderap.controller.BaseController;
 import cn.coderap.pojo.Users;
 import cn.coderap.pojo.bo.center.CenterUserBO;
@@ -38,6 +39,9 @@ public class CenterUserController extends BaseController {
     @Autowired
     private CenterUserService centerUserService;
 
+    @Autowired
+    private FileUpload fileUpload;
+
     @ApiOperation(value = "修改用户头像",notes = "修改用户头像",httpMethod = "POST")
     @PostMapping("/uploadFace")
     public JSONResult uploadFace(
@@ -49,7 +53,8 @@ public class CenterUserController extends BaseController {
             HttpServletResponse response) {
 
         // 定义头像保存的地址
-        String fileSpace = USER_FACE_IMAGE_LOCATION;
+        //String fileSpace = USER_FACE_IMAGE_LOCATION;
+        String fileSpace = fileUpload.getUserFaceImageLocation();
         // 在路径上增加userId, 用于区分不同用户的上传
         String uploadPathPrefix = File.separator + userId;
 

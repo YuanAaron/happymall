@@ -22,7 +22,7 @@ public class BaseController {
     String payReturnUrl = "http://yywzs2.natappfree.cc/orders/notifyMerchantOrderPaid";
 
     //用户上传头像的位置
-    public static final String USER_FACE_IMAGE_LOCATION = File.separator + "upload" + File.separator + "happymall";
+    //public static final String USER_FACE_IMAGE_LOCATION = File.separator + "upload" + File.separator + "happymall";
 
 
 
