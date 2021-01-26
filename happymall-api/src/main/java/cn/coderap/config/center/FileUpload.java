@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 public class FileUpload {
 
     private String userFaceImageLocation;
+    private String imageServerUrl;
 
     public String getUserFaceImageLocation() {
         return userFaceImageLocation;
@@ -21,5 +22,13 @@ public class FileUpload {
 
     public void setUserFaceImageLocation(String userFaceImageLocation) {
         this.userFaceImageLocation = userFaceImageLocation;
+    }
+
+    public String getImageServerUrl() {
+        return imageServerUrl;
+    }
+
+    public void setImageServerUrl(String imageServerUrl) {
+        this.imageServerUrl = imageServerUrl;
     }
 }

@@ -41,4 +41,15 @@ public class CenterUserServiceImpl implements CenterUserService {
         //查询最新user用以更新cookie
         return queryUserInfo(userId);
     }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public Users updateUserFace(String userId, String faceUrl) {
+        Users user = new Users();
+        user.setId(userId);
+        user.setFace(faceUrl);
+        user.setUpdatedTime(new Date());
+        usersMapper.updateByPrimaryKeySelective(user);
+        return queryUserInfo(userId);
+    }
 }

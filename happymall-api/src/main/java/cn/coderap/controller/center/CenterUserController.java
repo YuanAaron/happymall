@@ -6,6 +6,7 @@ import cn.coderap.pojo.Users;
 import cn.coderap.pojo.bo.center.CenterUserBO;
 import cn.coderap.service.center.CenterUserService;
 import cn.coderap.utils.CookieUtils;
+import cn.coderap.utils.DateUtil;
 import cn.coderap.utils.JSONResult;
 import cn.coderap.utils.JsonUtils;
 import io.swagger.annotations.Api;
@@ -74,6 +75,8 @@ public class CenterUserController extends BaseController {
 
                     //上传文件最终保存的位置
                     String uploadPath = fileSpace + uploadPathPrefix + File.separator + newFileName;
+                    //提供给web服务访问的地址
+                    uploadPathPrefix = uploadPathPrefix + "/" + newFileName;
 
                     File outFile = new File(uploadPath);
                     //如果文件目录不存在，创建文件夹（可能多级）
@@ -101,6 +104,18 @@ public class CenterUserController extends BaseController {
         } else {
             JSONResult.errorMsg("文件不能为空!");
         }
+
+        //获取图片服务地址
+        String imageServerUrl = fileUpload.getImageServerUrl();
+        //由于浏览器可能存在缓存，所以这里需要加上时间戳以保证更新后的图片可以及时刷新
+        String faceUrl = imageServerUrl + uploadPathPrefix + "?t" + DateUtil.getCurrentDateString(DateUtil.DATE_PATTERN);
+        //更新用户头像（地址）到数据库，如http://127.0.0.1:8088/images/1908017YR51G1XWH/face-1908017YR51G1XWH.jpg
+        Users userRes = centerUserService.updateUserFace(userId, faceUrl);
+        //更新Users后，覆盖cookie
+        userRes = setNullProperty(userRes);
+        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(userRes),true);
+
+        //TODO 在分布式会话中，增加令牌token，整合进redis
 
         return JSONResult.ok();
     }
