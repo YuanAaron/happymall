@@ -70,6 +70,13 @@ public class CenterUserController extends BaseController {
                     String[] fileNameArr = filename.split("\\.");
                     //获取文件的后缀名
                     String suffix = fileNameArr[fileNameArr.length - 1];
+                    //只在前端限定图片格式为png、jpg、jpeg，而后端没有进行格式校验，导致存在后门。黑客可能上传.sh .php文件，造成风险。
+                    if(!"png".equalsIgnoreCase(suffix) &&
+                            !"jpg".equalsIgnoreCase(suffix) &&
+                            !"jpeg".equalsIgnoreCase(suffix)) {
+                        return JSONResult.errorMsg("图片格式不正确");
+                    }
+
                     //重组文件名（这里是覆盖式上传，如果使用增量式，只需要在该文件名上拼接当前时间即可）
                     String newFileName = "face-" + userId + "." + suffix;
 
