@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.coderap.mapper.OrdersMapperCustom">
+  <resultMap id="myOrdersVO" type="cn.coderap.pojo.vo.MyOrdersVO">
+      <id column="orderId" property="orderId" />
+      <result column="createdTime" property="createdTime" />
+      <result column="payMethod" property="payMethod" />
+      <result column="realPayAmount" property="realPayAmount" />
+      <result column="postAmount" property="postAmount" />
+      <result column="orderStatus" property="orderStatus" />
+      <collection property="myOrderItemList" ofType="cn.coderap.pojo.vo.myOrderItemVO">
+          <result column="itemId" property="itemId" />
+          <result column="itemName" property="itemName" />
+          <result column="itemImg" property="itemImg" />
+          <result column="itemSpecName" property="itemSpecName" />
+          <result column="buyCounts" property="buyCounts" />
+          <result column="price" property="price" />
+      </collection>
+  </resultMap>
+
+    <!--orders表与order_stauts表是一对一关系，orders表与order_items表是一对多关系-->
+  <select id="queryMyOrders" resultMap="myOrdersVO" parameterType="java.util.Map">
+      SELECT
+          o.id AS orderId,
+          o.created_time AS createdTime,
+          o.pay_method AS payMethod,
+          o.real_pay_amount AS realPayAmount,
+          o.post_amount AS postAmount,
+          os.order_status AS orderStatus,
+          oi.item_id AS itemId,
+          oi.item_name AS itemName,
+          oi.item_img AS itemImg,
+          oi.item_spec_name AS itemSpecName,
+          oi.buy_counts AS buyCounts,
+          oi.price AS price
+      FROM
+          orders o
+              LEFT JOIN
+          order_status os
+          ON
+              o.id = os.order_id
+              LEFT JOIN
+          order_items oi
+          ON
+              o.id = oi.order_id
+      WHERE
+          o.user_id = #{paramsMap.userId}
+        AND
+          o.is_delete = 0
+          <if test="paramsMap.orderStatus != null">
+            AND os.order_status = #{paramsMap.orderStatus}
+          </if>
+      ORDER BY
+          o.updated_time ASC
+  </select>
+</mapper>
