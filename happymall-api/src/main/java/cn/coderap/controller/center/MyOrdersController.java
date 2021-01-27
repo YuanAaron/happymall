@@ -1,6 +1,7 @@
 package cn.coderap.controller.center;
 
 import cn.coderap.controller.BaseController;
+import cn.coderap.pojo.Orders;
 import cn.coderap.service.center.MyOrdersService;
 import cn.coderap.utils.JSONResult;
 import cn.coderap.utils.PagedGridResult;
@@ -9,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -61,6 +63,72 @@ public class MyOrdersController extends BaseController {
             JSONResult.errorMsg("订单id不能为空");
         }
         myOrdersService.updateDeliverOrderStatus(orderId);
+        return JSONResult.ok();
+    }
+
+    @ApiOperation(value = "确认收货",notes = "确认收货",httpMethod = "POST")
+    @PostMapping("/confirmReceive")
+    public JSONResult confirmReceive(
+            @ApiParam(name = "userId",value = "用户id",required = true)
+            @RequestParam String userId,
+            @ApiParam(name = "orderId",value = "订单id",required = true)
+            @RequestParam String orderId) {
+
+        if (StringUtils.isBlank(userId)) {
+            JSONResult.errorMsg("用户id不能为空");
+        }
+        if (StringUtils.isBlank(orderId)) {
+            JSONResult.errorMsg("订单id不能为空");
+        }
+
+        JSONResult result = checkUserOrder(userId, orderId);
+        if (result.getStatus() != HttpStatus.OK.value()) {
+            return result;
+        }
+        boolean res = myOrdersService.updateReceiveOrderStatus(orderId);
+        if (!res) {
+            return JSONResult.errorMsg("确认收货失败");
+        }
+        return JSONResult.ok();
+    }
+
+    @ApiOperation(value = "删除订单",notes = "删除订单",httpMethod = "POST")
+    @PostMapping("/delete")
+    public JSONResult delete(
+            @ApiParam(name = "userId",value = "用户id",required = true)
+            @RequestParam String userId,
+            @ApiParam(name = "orderId",value = "订单id",required = true)
+            @RequestParam String orderId) {
+
+        if (StringUtils.isBlank(userId)) {
+            JSONResult.errorMsg("用户id不能为空");
+        }
+        if (StringUtils.isBlank(orderId)) {
+            JSONResult.errorMsg("订单id不能为空");
+        }
+
+        JSONResult result = checkUserOrder(userId, orderId);
+        if (result.getStatus() != HttpStatus.OK.value()) {
+            return result;
+        }
+        boolean res = myOrdersService.deleteOrder(userId, orderId);
+        if (!res) {
+            return JSONResult.errorMsg("删除订单失败");
+        }
+        return JSONResult.ok();
+    }
+
+    /**
+     * 用于验证用户和订单是否有关联关系，避免非法用户调用
+     * @param userId
+     * @param orderId
+     * @return
+     */
+    private JSONResult checkUserOrder(String userId, String orderId) {
+        Orders order = myOrdersService.queryMyOrder(userId, orderId);
+        if (order == null) {
+            return JSONResult.errorMsg("订单不存在");
+        }
         return JSONResult.ok();
     }
 

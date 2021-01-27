@@ -1,9 +1,12 @@
 package cn.coderap.service.impl.center;
 
 import cn.coderap.enums.OrderStatusEnum;
+import cn.coderap.enums.YesOrNoEnum;
 import cn.coderap.mapper.OrderStatusMapper;
+import cn.coderap.mapper.OrdersMapper;
 import cn.coderap.mapper.OrdersMapperCustom;
 import cn.coderap.pojo.OrderStatus;
+import cn.coderap.pojo.Orders;
 import cn.coderap.pojo.vo.MyOrdersVO;
 import cn.coderap.service.center.MyOrdersService;
 import cn.coderap.utils.PagedGridResult;
@@ -32,6 +35,9 @@ public class MyOrdersServiceImpl implements MyOrdersService {
 
     @Autowired
     private OrderStatusMapper orderStatusMapper;
+
+    @Autowired
+    private OrdersMapper ordersMapper;
 
     @Transactional(propagation = Propagation.SUPPORTS)
     @Override
@@ -69,5 +75,54 @@ public class MyOrdersServiceImpl implements MyOrdersService {
         criteria.andEqualTo("orderId", orderId);
         criteria.andEqualTo("orderStatus", OrderStatusEnum.WAIT_DELIVER.type); //该条件不能少
         orderStatusMapper.updateByExampleSelective(orderStatus, example);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public Orders queryMyOrder(String userId, String orderId) {
+        Orders order = new Orders();
+        order.setId(orderId);
+        order.setUserId(userId);
+        order.setIsDelete(YesOrNoEnum.NO.type); //未删除
+        return ordersMapper.selectOne(order);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public boolean updateReceiveOrderStatus(String orderId) {
+        OrderStatus orderStatus = new OrderStatus();
+        orderStatus.setOrderStatus(OrderStatusEnum.SUCCESS.type);
+        orderStatus.setSuccessTime(new Date());
+
+        Example example = new Example(OrderStatus.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("orderId", orderId);
+        criteria.andEqualTo("orderStatus", OrderStatusEnum.WAIT_RECEIVE.type); //该条件不能少
+        int res = orderStatusMapper.updateByExampleSelective(orderStatus, example);
+        return res == 1 ? true : false;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public boolean deleteOrder(String userId, String orderId) {
+        //自己添加：订单状态为交易关闭时，才能进行删除
+        OrderStatus orderStatus = new OrderStatus();
+        orderStatus.setOrderId(orderId);
+        orderStatus.setOrderStatus(OrderStatusEnum.CLOSE.type);
+        OrderStatus orderStatusRes = orderStatusMapper.selectOne(orderStatus);
+        if (orderStatusRes==null) {
+            return false;
+        }
+
+        Orders order = new Orders();
+        order.setIsDelete(YesOrNoEnum.YES.type);
+        order.setUpdatedTime(new Date());
+
+        Example example = new Example(Orders.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("id", orderId);
+        criteria.andEqualTo("userId", userId);
+        int res = ordersMapper.updateByExampleSelective(order, example);
+        return res == 1 ? true : false;
     }
 }
