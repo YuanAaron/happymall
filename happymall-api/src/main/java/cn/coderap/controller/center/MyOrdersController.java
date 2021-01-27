@@ -49,4 +49,19 @@ public class MyOrdersController extends BaseController {
         PagedGridResult grid = myOrdersService.queryMyOrders(userId, orderStatus, page, pageSize);
         return JSONResult.ok(grid);
     }
+
+    //因为没有商家发货的后端，所以这个接口只是用于模拟
+    @ApiOperation(value = "商家发货",notes = "商家发货",httpMethod = "GET")
+    @GetMapping("/deliver")
+    public JSONResult deliver(
+            @ApiParam(name = "orderId",value = "订单id",required = true)
+            @RequestParam String orderId) {
+
+        if (StringUtils.isBlank(orderId)) {
+            JSONResult.errorMsg("订单id不能为空");
+        }
+        myOrdersService.updateDeliverOrderStatus(orderId);
+        return JSONResult.ok();
+    }
+
 }

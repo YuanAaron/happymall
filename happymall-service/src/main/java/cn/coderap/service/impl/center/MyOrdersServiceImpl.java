@@ -1,6 +1,9 @@
 package cn.coderap.service.impl.center;
 
+import cn.coderap.enums.OrderStatusEnum;
+import cn.coderap.mapper.OrderStatusMapper;
 import cn.coderap.mapper.OrdersMapperCustom;
+import cn.coderap.pojo.OrderStatus;
 import cn.coderap.pojo.vo.MyOrdersVO;
 import cn.coderap.service.center.MyOrdersService;
 import cn.coderap.utils.PagedGridResult;
@@ -10,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import tk.mybatis.mapper.entity.Example;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +29,9 @@ public class MyOrdersServiceImpl implements MyOrdersService {
 
     @Autowired
     private OrdersMapperCustom ordersMapperCustom;
+
+    @Autowired
+    private OrderStatusMapper orderStatusMapper;
 
     @Transactional(propagation = Propagation.SUPPORTS)
     @Override
@@ -47,5 +55,19 @@ public class MyOrdersServiceImpl implements MyOrdersService {
         grid.setTotal(pageList.getPages());
         grid.setRecords(pageList.getTotal());
         return grid;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public void updateDeliverOrderStatus(String orderId) {
+        OrderStatus orderStatus = new OrderStatus();
+        orderStatus.setOrderStatus(OrderStatusEnum.WAIT_RECEIVE.type);
+        orderStatus.setDeliverTime(new Date());
+
+        Example example = new Example(OrderStatus.class);
+        Example.Criteria criteria = example.createCriteria();
+        criteria.andEqualTo("orderId", orderId);
+        criteria.andEqualTo("orderStatus", OrderStatusEnum.WAIT_DELIVER.type); //该条件不能少
+        orderStatusMapper.updateByExampleSelective(orderStatus, example);
     }
 }
