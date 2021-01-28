@@ -11,7 +11,7 @@ public class ItemCommentVO {
 
     private Integer commentLevel;
     private String content;
-    private String sepcName;
+    private String specName;
     private Date createdTime;
     private String nickname;
     private String userFace;
@@ -32,12 +32,12 @@ public class ItemCommentVO {
         this.content = content;
     }
 
-    public String getSepcName() {
-        return sepcName;
+    public String getSpecName() {
+        return specName;
     }
 
-    public void setSepcName(String sepcName) {
-        this.sepcName = sepcName;
+    public void setSpecName(String specName) {
+        this.specName = specName;
     }
 
     public Date getCreatedTime() {
