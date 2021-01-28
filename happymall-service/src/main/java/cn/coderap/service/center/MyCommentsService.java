@@ -2,6 +2,7 @@ package cn.coderap.service.center;
 
 import cn.coderap.pojo.OrderItems;
 import cn.coderap.pojo.bo.center.OrderItemsCommentBO;
+import cn.coderap.utils.PagedGridResult;
 
 import java.util.List;
 
@@ -22,4 +23,12 @@ public interface MyCommentsService {
      */
     public void saveComments(String userId, String orderId, List<OrderItemsCommentBO> commentList);
 
+    /**
+     * 查询我的历史评价列表
+     * @param userId
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    PagedGridResult queryMyComments(String userId, Integer page, Integer pageSize);
 }

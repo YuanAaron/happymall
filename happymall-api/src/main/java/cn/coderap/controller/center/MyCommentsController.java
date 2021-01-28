@@ -93,4 +93,29 @@ public class MyCommentsController extends BaseController {
         return JSONResult.ok();
     }
 
+    @ApiOperation(value = "查询我的历史评价",notes = "查询我的历史评价",httpMethod = "POST")
+    @PostMapping("/query")
+    public JSONResult query(
+            @ApiParam(name = "userId",value = "用户id",required = true)
+            @RequestParam String userId,
+            @ApiParam(name = "page",value ="当前页数",required = false)
+            @RequestParam Integer page,
+            @ApiParam(name = "pageSize",value ="每页显示条数",required = false)
+            @RequestParam Integer pageSize) {
+
+        if (StringUtils.isBlank(userId)) {
+            return JSONResult.errorMsg("用户不存在"); //null
+        }
+
+        if (page==null) {
+            page=1;
+        }
+
+        if (pageSize==null) {
+            pageSize= COMMEN_PAGE_SIZE;
+        }
+        PagedGridResult grid = myCommentsService.queryMyComments(userId, page, pageSize);
+        return JSONResult.ok(grid);
+    }
+
 }

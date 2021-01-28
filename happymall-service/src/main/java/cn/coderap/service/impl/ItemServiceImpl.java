@@ -22,7 +22,7 @@ import tk.mybatis.mapper.entity.Example;
 import java.util.*;
 
 @Service
-public class ItemServiceImpl implements ItemService {
+public class ItemServiceImpl extends BaseService implements ItemService {
 
     @Autowired
     private ItemsMapper itemsMapper;
@@ -122,16 +122,6 @@ public class ItemServiceImpl implements ItemService {
         }
         //2、分页数据封装到PagedGridResult传给前端
         return setterPagedGrid(itemCommentVOList, page);
-    }
-
-    private PagedGridResult setterPagedGrid(List<?> list,Integer page) {
-        PageInfo<?> pageList=new PageInfo<>(list);
-        PagedGridResult grid = new PagedGridResult();
-        grid.setPage(page);
-        grid.setRows(list);
-        grid.setTotal(pageList.getPages());
-        grid.setRecords(pageList.getTotal());
-        return grid;
     }
 
     @Transactional(propagation = Propagation.SUPPORTS)

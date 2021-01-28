@@ -9,7 +9,11 @@ import cn.coderap.pojo.OrderItems;
 import cn.coderap.pojo.OrderStatus;
 import cn.coderap.pojo.Orders;
 import cn.coderap.pojo.bo.center.OrderItemsCommentBO;
+import cn.coderap.pojo.vo.MyCommentVO;
 import cn.coderap.service.center.MyCommentsService;
+import cn.coderap.service.impl.BaseService;
+import cn.coderap.utils.PagedGridResult;
+import com.github.pagehelper.PageHelper;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +30,7 @@ import java.util.Map;
  * 2021/1/25
  */
 @Service
-public class MyCommentsServiceImpl implements MyCommentsService {
+public class MyCommentsServiceImpl extends BaseService implements MyCommentsService {
 
     @Autowired
     private OrderItemsMapper orderItemsMapper;
@@ -51,6 +55,7 @@ public class MyCommentsServiceImpl implements MyCommentsService {
         return orderItemsMapper.select(orderItems);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void saveComments(String userId, String orderId, List<OrderItemsCommentBO> commentList) {
 
@@ -76,5 +81,16 @@ public class MyCommentsServiceImpl implements MyCommentsService {
         orderStatus.setOrderId(orderId);
         orderStatus.setCommentTime(new Date());
         orderStatusMapper.updateByPrimaryKeySelective(orderStatus);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public PagedGridResult queryMyComments(String userId, Integer page, Integer pageSize) {
+        Map<String,Object> map = new HashMap<>();
+        map.put("userId",userId);
+
+        PageHelper.startPage(page,pageSize);
+        List<MyCommentVO> myCommentVOList = itemsCommentsMapperCustom.queryMyComments(map);
+        return setterPagedGrid(myCommentVOList, page);
     }
 }
