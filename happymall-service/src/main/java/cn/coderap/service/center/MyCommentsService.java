@@ -1,6 +1,7 @@
 package cn.coderap.service.center;
 
 import cn.coderap.pojo.OrderItems;
+import cn.coderap.pojo.bo.center.OrderItemsCommentBO;
 
 import java.util.List;
 
@@ -12,5 +13,13 @@ public interface MyCommentsService {
      * @return
      */
     public List<OrderItems> queryPendingComment(String orderId);
+
+    /**
+     * 保存用户的评论
+     * @param userId
+     * @param orderId
+     * @param commentList
+     */
+    public void saveComments(String userId, String orderId, List<OrderItemsCommentBO> commentList);
 
 }

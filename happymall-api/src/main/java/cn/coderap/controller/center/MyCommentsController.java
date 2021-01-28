@@ -4,6 +4,7 @@ import cn.coderap.controller.BaseController;
 import cn.coderap.enums.YesOrNoEnum;
 import cn.coderap.pojo.OrderItems;
 import cn.coderap.pojo.Orders;
+import cn.coderap.pojo.bo.center.OrderItemsCommentBO;
 import cn.coderap.service.center.MyCommentsService;
 import cn.coderap.service.center.MyOrdersService;
 import cn.coderap.utils.JSONResult;
@@ -14,6 +15,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -59,6 +61,36 @@ public class MyCommentsController extends BaseController {
 
         List<OrderItems> orderItemList = myCommentsService.queryPendingComment(orderId);
         return JSONResult.ok(orderItemList);
+    }
+
+    @ApiOperation(value = "发表评论（保存评论列表）",notes = "发表评论（保存评论列表）",httpMethod = "POST")
+    @PostMapping("/saveList")
+    public JSONResult saveList(
+            @ApiParam(name = "userId",value = "用户id",required = true)
+            @RequestParam String userId,
+            @ApiParam(name = "orderId", value = "订单id",required = true)
+            @RequestParam String orderId,
+            @RequestBody List<OrderItemsCommentBO> commentList) { //这里用List接收，是因为传过来的是一个json数组
+
+        if (StringUtils.isBlank(userId)) {
+            JSONResult.errorMsg("用户id不能为空");
+        }
+        if (StringUtils.isBlank(orderId)) {
+            JSONResult.errorMsg("订单id不能为空");
+        }
+
+        //判断用户和订单是否关联
+        JSONResult result = checkUserOrder(userId, orderId);
+        if (result.getStatus() != HttpStatus.OK.value()) {
+            return result;
+        }
+
+        if(commentList == null || commentList.isEmpty()) {
+            return JSONResult.errorMsg("评论内容不能为空！");
+        }
+
+        myCommentsService.saveComments(userId, orderId, commentList);
+        return JSONResult.ok();
     }
 
 }
