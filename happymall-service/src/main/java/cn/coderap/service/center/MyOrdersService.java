@@ -1,6 +1,7 @@
 package cn.coderap.service.center;
 
 import cn.coderap.pojo.Orders;
+import cn.coderap.pojo.vo.OrderStatusCountsVO;
 import cn.coderap.utils.PagedGridResult;
 
 public interface MyOrdersService {
@@ -41,4 +42,6 @@ public interface MyOrdersService {
      * @return
      */
     public boolean deleteOrder(String userId, String orderId);
+
+    public OrderStatusCountsVO getOrderStatusCounts(String userId);
 }

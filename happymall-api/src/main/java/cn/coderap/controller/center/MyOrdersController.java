@@ -2,6 +2,7 @@ package cn.coderap.controller.center;
 
 import cn.coderap.controller.BaseController;
 import cn.coderap.pojo.Orders;
+import cn.coderap.pojo.vo.OrderStatusCountsVO;
 import cn.coderap.service.center.MyOrdersService;
 import cn.coderap.utils.JSONResult;
 import cn.coderap.utils.PagedGridResult;
@@ -24,6 +25,20 @@ public class MyOrdersController extends BaseController {
 
 //    @Autowired
 //    private MyOrdersService myOrdersService;
+
+    @ApiOperation(value = "获取各种状态订单数",notes = "获取各种状态订单数",httpMethod = "POST")
+    @PostMapping("/statusCounts")
+    public JSONResult statusCounts(
+            @ApiParam(name = "userId",value = "用户id",required = true)
+            @RequestParam String userId) {
+
+        if (StringUtils.isBlank(userId)) {
+            JSONResult.errorMsg(null);
+        }
+
+        OrderStatusCountsVO orderStatusCounts = myOrdersService.getOrderStatusCounts(userId);
+        return JSONResult.ok(orderStatusCounts);
+    }
 
     @ApiOperation(value = "查询所有订单列表",notes = "查询所有订单列表",httpMethod = "POST")
     @PostMapping("/query")

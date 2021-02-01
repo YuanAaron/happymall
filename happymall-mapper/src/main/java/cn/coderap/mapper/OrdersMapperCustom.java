@@ -9,4 +9,6 @@ import java.util.Map;
 public interface OrdersMapperCustom {
 
     public List<MyOrdersVO> queryMyOrders(@Param("paramsMap") Map<String,Object> map);
+
+    public Integer getMyOrderStatusCounts(@Param("paramsMap") Map<String,Object> map);
 }

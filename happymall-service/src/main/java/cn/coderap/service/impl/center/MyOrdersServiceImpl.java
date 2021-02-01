@@ -8,6 +8,7 @@ import cn.coderap.mapper.OrdersMapperCustom;
 import cn.coderap.pojo.OrderStatus;
 import cn.coderap.pojo.Orders;
 import cn.coderap.pojo.vo.MyOrdersVO;
+import cn.coderap.pojo.vo.OrderStatusCountsVO;
 import cn.coderap.service.center.MyOrdersService;
 import cn.coderap.service.impl.BaseService;
 import cn.coderap.utils.PagedGridResult;
@@ -114,5 +115,36 @@ public class MyOrdersServiceImpl extends BaseService implements MyOrdersService 
         criteria.andEqualTo("userId", userId);
         int res = ordersMapper.updateByExampleSelective(order, example);
         return res == 1 ? true : false;
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public OrderStatusCountsVO getOrderStatusCounts(String userId) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId", userId);
+
+        //待付款
+        map.put("orderStatus",OrderStatusEnum.WAIT_PAY.type);
+        Integer waitPayCounts = ordersMapperCustom.getMyOrderStatusCounts(map);
+
+        //待发货
+        map.put("orderStatus", OrderStatusEnum.WAIT_DELIVER.type);
+        Integer waitDeliverCounts = ordersMapperCustom.getMyOrderStatusCounts(map);
+
+        //待收货
+        map.put("orderStatus", OrderStatusEnum.WAIT_RECEIVE.type);
+        Integer waitReceiveCounts = ordersMapperCustom.getMyOrderStatusCounts(map);
+
+        //待评价 = 交易成功 + 未评价
+        map.put("orderStatus", OrderStatusEnum.SUCCESS.type);
+        map.put("isComment", YesOrNoEnum.NO.type);
+        Integer waitCommentCounts = ordersMapperCustom.getMyOrderStatusCounts(map);
+
+        OrderStatusCountsVO vo = new OrderStatusCountsVO();
+        vo.setWaitPayCounts(waitPayCounts);
+        vo.setWaitDeliverCounts(waitDeliverCounts);
+        vo.setWaitReceiveCounts(waitReceiveCounts);
+        vo.setWaitCommentCounts(waitCommentCounts);
+        return vo;
     }
 }
