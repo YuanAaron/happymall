@@ -23,7 +23,10 @@ public class BaseController {
     //这个是支付中心回调通知happymall的url
 //    String payReturnUrl = "http://127.0.0.1:8088/orders/notifyMerchantOrderPaid";
     //内网穿透：将本地服务器放到公网，以供支付中心调用  注意：每次重启natapp该地址都会更改
-    String payReturnUrl = "http://4t7vwb.natappfree.cc/orders/notifyMerchantOrderPaid";
+    //开发
+    //String payReturnUrl = "http://4t7vwb.natappfree.cc/orders/notifyMerchantOrderPaid";
+    //生产
+    String payReturnUrl = "http://47.93.190.199:8088/happymall/orders/notifyMerchantOrderPaid";
 
     //用户上传头像的位置
     //public static final String USER_FACE_IMAGE_LOCATION = File.separator + "upload" + File.separator + "happymall"+ File.separator + "images";

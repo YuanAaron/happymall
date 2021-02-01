@@ -1,0 +1,12 @@
+server:
+  port: 8088
+
+spring:
+  datasource:
+    # 集群或分布式系统，一定要使用内网IP(如果项目和数据库在同一台服务器上，可以使用localhost或内网IP)
+    url: jdbc:mysql://localhost:3306/happymall?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
+    password: Kexin!00
+
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

@@ -11,6 +11,16 @@
 
     <artifactId>happymall-api</artifactId>
 
+    <!--
+    打包：
+    1、增加<packaging>war</packaging>
+    2、从spring-boot-starter-web中移除内嵌的tomcat
+    3、添加javax.servlet-api依赖，以提供servlet支持
+    4、添加war的启动类
+    -->
+    <!--打包：第一步-->
+    <packaging>war</packaging>
+
     <dependencies>
         <!--
             api->service->mapper->pojo->common, api可以使用service、pojo与common中相应的方法
@@ -20,6 +30,14 @@
             <artifactId>happymall-service</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+
+        <!--打包：第三步，添加依赖-->
+        <!--放在happymall-api的pom中，打包时会报错,因此移动到聚合工程中-->
+        <!--<dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>-->
     </dependencies>
 
 
