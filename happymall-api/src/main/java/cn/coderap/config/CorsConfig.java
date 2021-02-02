@@ -20,6 +20,8 @@ public class CorsConfig {
         CorsConfiguration config=new CorsConfiguration();
         config.addAllowedOrigin("http://localhost:8080"); //在这里localhost和127.0.0.1不同，两个最好都添加上
         config.addAllowedOrigin("http://127.0.0.1:8080");
+        config.addAllowedOrigin("http://47.93.190.199:8080"); //tomcat启动前端时使用 如果使用域名，happymall-web和happymall-center都要添加
+        config.addAllowedOrigin("http://47.93.190.199"); //nginx启动前端时使用 如果使用域名，happymall-web和happymall-center都要添加
         //设置是否发送cookie信息
         config.setAllowCredentials(true);
         //设置允许请求的方式，比如GET、POST等
