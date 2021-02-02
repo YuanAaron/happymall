@@ -68,6 +68,8 @@ public class MyOrdersController extends BaseController {
     }
 
     //因为没有商家发货的后端，所以这个接口只是用于模拟
+    //开发：127.0.0.1:8088/myorders/deliver?orderId=订单编号
+    //生产：47.93.190.199:8088/happymall/deliver?orderId=订单编号
     @ApiOperation(value = "商家发货",notes = "商家发货",httpMethod = "GET")
     @GetMapping("/deliver")
     public JSONResult deliver(
