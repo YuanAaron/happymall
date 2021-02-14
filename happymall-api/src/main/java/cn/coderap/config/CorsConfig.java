@@ -22,6 +22,10 @@ public class CorsConfig {
         config.addAllowedOrigin("http://127.0.0.1:8080");
         config.addAllowedOrigin("http://47.93.190.199:8080"); //tomcat启动前端时使用 如果使用域名，happymall-web和happymall-center都要添加
         config.addAllowedOrigin("http://47.93.190.199"); //nginx启动前端时使用 如果使用域名，happymall-web和happymall-center都要添加
+        config.addAllowedOrigin("http://web.coderap.cn:8080");
+        config.addAllowedOrigin("http://center.coderap.cn:8080");
+        config.addAllowedOrigin("http://web.coderap.cn");
+        config.addAllowedOrigin("http://center.coderap.cn");
         //设置是否发送cookie信息
         config.setAllowCredentials(true);
         //设置允许请求的方式，比如GET、POST等
