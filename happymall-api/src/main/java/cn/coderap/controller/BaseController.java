@@ -26,7 +26,7 @@ public class BaseController {
     //开发
     //String payReturnUrl = "http://4t7vwb.natappfree.cc/orders/notifyMerchantOrderPaid";
     //生产
-    String payReturnUrl = "http://47.93.190.199:8088/happymall/orders/notifyMerchantOrderPaid";
+    String payReturnUrl = "http://api.coderap.cn:8088/happymall/orders/notifyMerchantOrderPaid";
 
     //用户上传头像的位置
     //public static final String USER_FACE_IMAGE_LOCATION = File.separator + "upload" + File.separator + "happymall"+ File.separator + "images";
