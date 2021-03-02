@@ -2,7 +2,7 @@
 spring:
   profiles:
     # 生产环境部署时，只需将dev更改为prod即可
-    active: prod
+    active: dev
   datasource:
     type: com.zaxxer.hikari.HikariDataSource  # 数据源类型：HikariCP
     driver-class-name: com.mysql.jdbc.Driver  # mysql驱动
