@@ -8,6 +8,7 @@ import cn.coderap.pojo.bo.SubmitOrderBO;
 import cn.coderap.pojo.vo.MerchantOrdersVO;
 import cn.coderap.pojo.vo.OrdersVO;
 import cn.coderap.service.OrderService;
+import cn.coderap.utils.CookieUtils;
 import cn.coderap.utils.JSONResult;
 import cn.coderap.utils.JsonUtils;
 import cn.coderap.utils.RedisOperator;
@@ -20,6 +21,8 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 
@@ -46,7 +49,9 @@ public class OrdersController extends BaseController{
     @ApiOperation(value = "用户提交订单",notes = "用户提交订单",httpMethod = "POST")
     @PostMapping("/create")
     public JSONResult create(@ApiParam(name = "submitOrderBO",value ="用于创建订单的BO",required = true)
-                                  @RequestBody SubmitOrderBO submitOrderBO) {
+                                  @RequestBody SubmitOrderBO submitOrderBO,
+                             HttpServletRequest request,
+                             HttpServletResponse response) {
         Integer payMethod = submitOrderBO.getPayMethod();
         if (payMethod != PayMethodEnum.WECHAT.type && payMethod != PayMethodEnum.ALIPAY.type) {
             JSONResult.errorMsg("支付方式不支持！");
@@ -62,8 +67,10 @@ public class OrdersController extends BaseController{
         String orderId = ordersVO.getOrderId();
 
         //2、创建订单后，移除购物车中已结算（已提交）的商品
-        //TODO 整合redis后，完善购物车中已结算商品的清除，并同步到前端的cookie
-//        CookieUtils.setCookie(request, response, HAPPYMALL_SHOPCART, "",true); //目前直接将整个cookie设置为空,为了方便后面开发，就先注释掉了
+        //整合redis后，完善购物车中已结算商品的清除，并同步到前端的cookie
+        shopcartList.removeAll(ordersVO.getToBeRemovedShopcartItemBOList());
+        redisOperator.set(HAPPYMALL_SHOPCART + ":" + submitOrderBO.getUserId(), JsonUtils.objectToJson(shopcartList));
+        CookieUtils.setCookie(request, response, HAPPYMALL_SHOPCART, JsonUtils.objectToJson(shopcartList),true);
 
         //3、向支付中心（已经封装好的，再由支付中心向微信等发送支付请求）发送当前订单
         // 如何发起一个Rest请求调用其他项目中rest风格的接口呢？ //http 或 springMVC提供的RestTemplate

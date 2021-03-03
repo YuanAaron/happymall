@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -74,11 +75,14 @@ public class OrderServiceImpl implements OrderService {
         String[] ids = itemSpecIds.split(",");
         Integer totalAmount = 0; //订单总价格
         Integer realPayAmount = 0; //实际支付总价格
+        List<ShopcartItemBO> toBeRemovedShopcartItemBOList = new ArrayList<>();
         for (String id : ids) {
             //整合redis后，商品购买的数量重新从redis购物车中获取
             //Integer buyCounts = 1; //测试用
             ShopcartItemBO shopcartItemBO = getbuyCountsFromShopcart(shopcartList, id);
             Integer buyCounts = shopcartItemBO.getBuyCounts();
+            //创建订单时，将已结算的商品放入到等待被移除的列表中，订单创建完成后，将redis购物车中已结算商品的清除，并同步到前端的cookie
+            toBeRemovedShopcartItemBOList.add(shopcartItemBO);
 
             //2.1 根据规格id查询规格的具体信息
             ItemsSpec itemsSpec = itemService.queryItemsSpecById(id);
@@ -129,6 +133,7 @@ public class OrderServiceImpl implements OrderService {
         OrdersVO ordersVO = new OrdersVO();
         ordersVO.setOrderId(orderId);
         ordersVO.setMerchantOrdersVO(merchantOrdersVO);
+        ordersVO.setToBeRemovedShopcartItemBOList(toBeRemovedShopcartItemBOList);
         return ordersVO;
     }
 
