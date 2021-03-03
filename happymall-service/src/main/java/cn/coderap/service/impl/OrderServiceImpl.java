@@ -6,6 +6,7 @@ import cn.coderap.mapper.OrderItemsMapper;
 import cn.coderap.mapper.OrderStatusMapper;
 import cn.coderap.mapper.OrdersMapper;
 import cn.coderap.pojo.*;
+import cn.coderap.pojo.bo.ShopcartItemBO;
 import cn.coderap.pojo.bo.SubmitOrderBO;
 import cn.coderap.pojo.vo.MerchantOrdersVO;
 import cn.coderap.pojo.vo.OrdersVO;
@@ -13,6 +14,7 @@ import cn.coderap.service.AddressService;
 import cn.coderap.service.ItemService;
 import cn.coderap.service.OrderService;
 import cn.coderap.utils.DateUtil;
+import cn.coderap.utils.RedisOperator;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,7 +42,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
-    public OrdersVO createOrder(SubmitOrderBO submitOrderBO) {
+    public OrdersVO createOrder(SubmitOrderBO submitOrderBO, List<ShopcartItemBO> shopcartList) {
         String userId = submitOrderBO.getUserId();
         String addressId = submitOrderBO.getAddressId();
         String itemSpecIds = submitOrderBO.getItemSpecIds();
@@ -73,9 +75,13 @@ public class OrderServiceImpl implements OrderService {
         Integer totalAmount = 0; //订单总价格
         Integer realPayAmount = 0; //实际支付总价格
         for (String id : ids) {
+            //整合redis后，商品购买的数量重新从redis购物车中获取
+            //Integer buyCounts = 1; //测试用
+            ShopcartItemBO shopcartItemBO = getbuyCountsFromShopcart(shopcartList, id);
+            Integer buyCounts = shopcartItemBO.getBuyCounts();
+
             //2.1 根据规格id查询规格的具体信息
             ItemsSpec itemsSpec = itemService.queryItemsSpecById(id);
-            Integer buyCounts = 1; //TODO 整合redis后，商品购买的数量重新从redis购物车中获取
             totalAmount += itemsSpec.getPriceNormal() * buyCounts;
             realPayAmount += itemsSpec.getPriceDiscount() * buyCounts;
 
@@ -124,6 +130,21 @@ public class OrderServiceImpl implements OrderService {
         ordersVO.setOrderId(orderId);
         ordersVO.setMerchantOrdersVO(merchantOrdersVO);
         return ordersVO;
+    }
+
+    /**
+     * 从redis中的购物车中里获取商品，目的是获取buyCounts
+     * @param shopcartList
+     * @param id
+     * @return
+     */
+    private ShopcartItemBO getbuyCountsFromShopcart(List<ShopcartItemBO> shopcartList, String id) {
+        for (ShopcartItemBO shopcartItemBO : shopcartList) {
+            if (shopcartItemBO.getSpecId().equals(id)) {
+                return shopcartItemBO;
+            }
+        }
+        return null;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

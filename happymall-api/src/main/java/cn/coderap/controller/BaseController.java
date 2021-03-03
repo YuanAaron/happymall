@@ -11,6 +11,8 @@ import java.io.File;
 @RestController
 public class BaseController {
 
+    public static final String HAPPYMALL_SHOPCART = "shopcart";
+
     public static final Integer COMMEN_PAGE_SIZE = 10;
 
     public static final Integer PAGE_SIZE = 20;
@@ -30,7 +32,6 @@ public class BaseController {
 
     //用户上传头像的位置
     //public static final String USER_FACE_IMAGE_LOCATION = File.separator + "upload" + File.separator + "happymall"+ File.separator + "images";
-
 
     @Autowired
     public MyOrdersService myOrdersService;

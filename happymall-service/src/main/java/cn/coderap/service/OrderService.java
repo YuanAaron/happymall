@@ -1,15 +1,18 @@
 package cn.coderap.service;
 
 import cn.coderap.pojo.OrderStatus;
+import cn.coderap.pojo.bo.ShopcartItemBO;
 import cn.coderap.pojo.bo.SubmitOrderBO;
 import cn.coderap.pojo.vo.OrdersVO;
+
+import java.util.List;
 
 public interface OrderService {
 
     /**
      * 用于创建订单
      */
-    public OrdersVO createOrder(SubmitOrderBO submitOrderBO);
+    public OrdersVO createOrder(SubmitOrderBO submitOrderBO, List<ShopcartItemBO> shopcartList);
 
     /**
      * 修改订单状态

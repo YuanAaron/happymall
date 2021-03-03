@@ -3,18 +3,24 @@ package cn.coderap.controller;
 import cn.coderap.enums.OrderStatusEnum;
 import cn.coderap.enums.PayMethodEnum;
 import cn.coderap.pojo.OrderStatus;
+import cn.coderap.pojo.bo.ShopcartItemBO;
 import cn.coderap.pojo.bo.SubmitOrderBO;
 import cn.coderap.pojo.vo.MerchantOrdersVO;
 import cn.coderap.pojo.vo.OrdersVO;
 import cn.coderap.service.OrderService;
 import cn.coderap.utils.JSONResult;
+import cn.coderap.utils.JsonUtils;
+import cn.coderap.utils.RedisOperator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
 
 
 @Api(value = "订单相关",tags = {"订单相关的接口"})
@@ -34,6 +40,9 @@ public class OrdersController extends BaseController{
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private RedisOperator redisOperator;
+
     @ApiOperation(value = "用户提交订单",notes = "用户提交订单",httpMethod = "POST")
     @PostMapping("/create")
     public JSONResult create(@ApiParam(name = "submitOrderBO",value ="用于创建订单的BO",required = true)
@@ -43,8 +52,13 @@ public class OrdersController extends BaseController{
             JSONResult.errorMsg("支付方式不支持！");
         }
 
+        String shopcart = redisOperator.get(HAPPYMALL_SHOPCART + ":" + submitOrderBO.getUserId());
+        if (StringUtils.isBlank(shopcart)) {
+            return JSONResult.errorMsg("购物车数据不正确");
+        }
+        List<ShopcartItemBO> shopcartList = JsonUtils.jsonToList(shopcart, ShopcartItemBO.class);
         //1、创建订单
-        OrdersVO ordersVO = orderService.createOrder(submitOrderBO);
+        OrdersVO ordersVO = orderService.createOrder(submitOrderBO,shopcartList);
         String orderId = ordersVO.getOrderId();
 
         //2、创建订单后，移除购物车中已结算（已提交）的商品
