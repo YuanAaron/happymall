@@ -7,11 +7,27 @@ spring:
     url: jdbc:mysql://localhost:3306/happymall?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false
     password: Kexin!00
 
+  #redis单机单实例
+#  redis:
+#    host: 47.93.190.199
+#    password: oshacker
+#    port: 6379
+#    database: 1
+
+  #redis哨兵模式
+#  redis:
+#    database: 1
+#    password: oshacker
+#    sentinel:
+#      master: oshacker-master
+#      nodes: 192.168.3.100:26379,192.168.3.101:26379,192.168.3.102:26379
+
+  #redis集群
   redis:
-    host: 47.93.190.199
     password: oshacker
-    port: 6379
-    database: 1
+    cluster:
+      nodes: 192.168.3.103:6379,192.168.3.104:6379,192.168.3.105:6379,192.168.3.106:6379,192.168.3.107:6379,192.168.3.108:6379
+
 
 mybatis:
   configuration:
