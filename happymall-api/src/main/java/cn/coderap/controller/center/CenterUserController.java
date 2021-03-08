@@ -4,6 +4,7 @@ import cn.coderap.config.center.FileUpload;
 import cn.coderap.controller.BaseController;
 import cn.coderap.pojo.Users;
 import cn.coderap.pojo.bo.center.CenterUserBO;
+import cn.coderap.pojo.vo.UsersVO;
 import cn.coderap.service.center.CenterUserService;
 import cn.coderap.utils.CookieUtils;
 import cn.coderap.utils.DateUtil;
@@ -119,10 +120,11 @@ public class CenterUserController extends BaseController {
         //更新用户头像（地址）到数据库，如http://127.0.0.1:8088/images/1908017YR51G1XWH/face-1908017YR51G1XWH.jpg
         Users userRes = centerUserService.updateUserFace(userId, faceUrl);
         //更新Users后，覆盖cookie
-        userRes = setNullProperty(userRes);
-        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(userRes),true);
+//        userRes = setNullProperty(userRes);
 
-        //TODO 在分布式会话中，增加令牌token，整合进redis
+        //在分布式会话中，增加令牌token，整合进redis
+        UsersVO usersVO = convertToUsersVO(userRes);
+        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(usersVO),true);
 
         return JSONResult.ok();
     }
@@ -146,10 +148,11 @@ public class CenterUserController extends BaseController {
 
         Users userRes = centerUserService.updateUserInfo(userId, centerUserBO);
         //更新Users后，覆盖cookie
-        userRes = setNullProperty(userRes);
-        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(userRes),true);
+//        userRes = setNullProperty(userRes);
 
-        //TODO 在分布式会话中，增加令牌token，整合进redis
+        //在分布式会话中，增加令牌token，整合进redis
+        UsersVO usersVO = convertToUsersVO(userRes);
+        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(usersVO),true);
 
         return JSONResult.ok();
     }

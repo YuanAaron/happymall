@@ -1,15 +1,25 @@
 package cn.coderap.controller;
 
 import cn.coderap.pojo.Orders;
+import cn.coderap.pojo.Users;
+import cn.coderap.pojo.vo.UsersVO;
 import cn.coderap.service.center.MyOrdersService;
 import cn.coderap.utils.JSONResult;
+import cn.coderap.utils.RedisOperator;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
+import java.util.UUID;
 
 @RestController
 public class BaseController {
+
+    @Autowired
+    private RedisOperator redisOperator;
+
+    public static final String USER_TOKEN_REDIS = "user_token";
 
     public static final String HAPPYMALL_SHOPCART = "shopcart";
 
@@ -48,6 +58,15 @@ public class BaseController {
             return JSONResult.errorMsg("订单不存在");
         }
         return JSONResult.ok(order); //order用于后面判断是否已评价
+    }
+
+    public UsersVO convertToUsersVO(Users userRes) {
+        String uniqueToken = UUID.randomUUID().toString().trim();
+        redisOperator.set(USER_TOKEN_REDIS + ":" + userRes.getId(), uniqueToken); //TODO 对uniqueToken进行base64加密
+        UsersVO usersVO = new UsersVO();
+        BeanUtils.copyProperties(userRes, usersVO);
+        usersVO.setUniqueToken(uniqueToken);
+        return usersVO;
     }
 
 }

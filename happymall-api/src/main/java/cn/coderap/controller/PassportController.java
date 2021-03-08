@@ -3,11 +3,13 @@ package cn.coderap.controller;
 import cn.coderap.pojo.Users;
 import cn.coderap.pojo.bo.ShopcartItemBO;
 import cn.coderap.pojo.bo.UserBO;
+import cn.coderap.pojo.vo.UsersVO;
 import cn.coderap.service.UserService;
 import cn.coderap.utils.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by yw
@@ -77,10 +80,13 @@ public class PassportController extends BaseController{
         }
         //5、实现注册
         Users userRes=userService.createUser(userBO);
-        userRes=setNullProperty(userRes);
-        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(userRes),true);
+//        userRes=setNullProperty(userRes); //因为使用了UsersVO，将需要放到cookie中的用户信息封装到了UsersVO中，这个方法也就没有必要了
 
-        //TODO 在分布式会话中，生成用户token，存入redis会话
+        //在分布式会话中，生成用户token，存入redis会话
+        //方案一：将uniqueToken直接放到一个新的cookie(user_token)中
+        //方案二：将uniqueToken和用户信息封装到UsersVO中，然后放到cookie（user）中,这里采用第二种方案。
+        UsersVO usersVO = convertToUsersVO(userRes);
+        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(usersVO),true);
         //在分布式会话中，同步购物车数据
         synchShopcartData(userRes.getId(),request,response);
 
@@ -112,10 +118,13 @@ public class PassportController extends BaseController{
         //登录后，直接将userRes放到cookie中，但需要去除一部分敏感信息，比如password、realname等，一种方法是在Users的这些属性上使用
         //@JsonIgnore注解，这样当把这个实体类封装为JsonObject返回给前端时，不会显示这些属性（缺点：要修改从数据库逆向生成的原始实体
         //类，不建议）；方法二：在此处将这些属性直接设置为null
-        userRes=setNullProperty(userRes);
-        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(userRes),true);
+//        userRes=setNullProperty(userRes);//因为使用了UsersVO，将需要放到cookie中的用户信息封装到了UsersVO中，这个方法也就没有必要了
 
-        //TODO 在分布式会话中，生成用户token，存入redis会话
+        //在分布式会话中，生成用户token，存入redis会话
+        //原理同注册
+        UsersVO usersVO = convertToUsersVO(userRes);
+        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(usersVO),true);
+
         //在分布式会话中，同步购物车数据
         synchShopcartData(userRes.getId(),request,response);
 
@@ -206,10 +215,11 @@ public class PassportController extends BaseController{
                              HttpServletResponse response) {
         //清除用户信息相关的cookie
         CookieUtils.deleteCookie(request,response,"user");
+        //在分布式会话中，需要清除redis中的会话信息（token）
+        redisOperator.del(USER_TOKEN_REDIS + ":" + userId);
 
         //用户退出登录时，需要清空cookie购物车
         CookieUtils.deleteCookie(request, response, HAPPYMALL_SHOPCART);
-        //TODO 在分布式会话中，需要清除用户数据（不是很懂）
 
         return JSONResult.ok();
     }
