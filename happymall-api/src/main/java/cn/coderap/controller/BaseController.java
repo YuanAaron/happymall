@@ -10,7 +10,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.File;
 import java.util.UUID;
 
 @RestController
@@ -65,7 +64,7 @@ public class BaseController {
         redisOperator.set(USER_TOKEN_REDIS + ":" + userRes.getId(), uniqueToken); //TODO 对uniqueToken进行base64加密
         UsersVO usersVO = new UsersVO();
         BeanUtils.copyProperties(userRes, usersVO);
-        usersVO.setUniqueToken(uniqueToken);
+        usersVO.setUserUniqueToken(uniqueToken);
         return usersVO;
     }
 

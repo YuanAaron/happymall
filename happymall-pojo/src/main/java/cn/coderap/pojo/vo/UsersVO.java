@@ -13,7 +13,7 @@ public class UsersVO {
     private String face;
     private String sex;
     //分布式中用户会话token
-    private String uniqueToken;
+    private String userUniqueToken;
 
     public String getId() {
         return id;
@@ -55,11 +55,11 @@ public class UsersVO {
         this.sex = sex;
     }
 
-    public String getUniqueToken() {
-        return uniqueToken;
+    public String getUserUniqueToken() {
+        return userUniqueToken;
     }
 
-    public void setUniqueToken(String uniqueToken) {
-        this.uniqueToken = uniqueToken;
+    public void setUserUniqueToken(String userUniqueToken) {
+        this.userUniqueToken = userUniqueToken;
     }
 }
