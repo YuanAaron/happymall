@@ -1,5 +1,7 @@
 package cn.coderap.controller.interceptor;
 
+import cn.coderap.utils.JSONResult;
+import cn.coderap.utils.JsonUtils;
 import cn.coderap.utils.RedisOperator;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 
 /**
  * 拦截器使用的必要性：
@@ -36,21 +41,46 @@ public class UserTokenInterceptor implements HandlerInterceptor {
         if (StringUtils.isNotBlank(userId) && StringUtils.isNotBlank(userToken)) {
             String uniqueToken = redisOperator.get(USER_TOKEN_REDIS + ":" + userId);
             if (StringUtils.isBlank(uniqueToken)) {
-                System.out.println("请登录...");
+//                System.out.println("请登录...");
+                returnErrorMsg(response, JSONResult.errorMsg("请登录..."));
                 return false;
             } else {
                 if (!uniqueToken.equals(userToken)) {
                     //先在A处（换个浏览器就能行）登录，再在B处登录，然后在A处访问拦截器中的请求，A处就会被要求重新登录
                     //因为B处的登录修改了redis中的token，A处再访问从前端传过来的token就过时了
-                    System.out.println("账号在异地登录...");
+//                    System.out.println("账号在异地登录...");
+                    returnErrorMsg(response, JSONResult.errorMsg("账号在异地登录..."));
                     return false;
                 }
             }
         } else {
-            System.out.println("请登录...");
+//            System.out.println("请登录...");
+            returnErrorMsg(response, JSONResult.errorMsg("请登录..."));
             return false;
         }
         return true;
+    }
+
+    public void returnErrorMsg(HttpServletResponse response,
+                               JSONResult result) {
+        OutputStream out = null;
+        try {
+            response.setCharacterEncoding("utf-8");
+            response.setContentType("text/json");
+            out = response.getOutputStream();
+            out.write(JsonUtils.objectToJson(result).getBytes(StandardCharsets.UTF_8));
+            out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     //在访问Controller之后，渲染视图之前
