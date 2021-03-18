@@ -22,6 +22,11 @@ spring:
     multipart:
       max-file-size: 512000    # 上传文件大小限制为500kb，默认1M
       max-request-size: 512000 # 请求大小限制为500kb，默认10M
+  thymeleaf:
+    mode: HTML
+    encoding: UTF-8
+    prefix: classpath:/templates/
+    suffix: .html
 
 # mybatis配置
 mybatis:
