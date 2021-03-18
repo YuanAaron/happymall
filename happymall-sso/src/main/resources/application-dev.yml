@@ -12,7 +12,7 @@ spring:
     host: 47.93.190.199
     password: oshacker
     port: 6379
-    database: 1
+    database: 2
 
   #redis哨兵模式
 #  redis:
