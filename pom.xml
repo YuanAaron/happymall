@@ -14,6 +14,7 @@
         <module>happymall-mapper</module>
         <module>happymall-service</module>
         <module>happymall-api</module>
+        <module>happymall-sso</module>
     </modules>
 
     <!--聚合工程-->
