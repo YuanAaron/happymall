@@ -1,9 +1,12 @@
 package cn.coderap.config;
 
+import cn.coderap.controller.interceptor.UserTokenInterceptor;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -27,5 +30,21 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/**") //对应路径下的所有资源
                 .addResourceLocations("file:/upload/happymall/") //为本地静态资源（头像）添加映射
                 .addResourceLocations("classpath:/META-INF/resources/");
+    }
+
+    @Bean
+    public UserTokenInterceptor userTokenInterceptor() {
+        return new UserTokenInterceptor();
+    }
+
+    /**
+     * 注册拦截器
+     * @param registry
+     */
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(userTokenInterceptor())
+                .addPathPatterns("/hello");
+        WebMvcConfigurer.super.addInterceptors(registry);
     }
 }
