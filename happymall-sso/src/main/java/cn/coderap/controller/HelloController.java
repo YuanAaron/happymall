@@ -130,9 +130,20 @@ public class HelloController {
             redisOperator.del(TMP_TICKET_REDIS + ":" + tmpTicket);
         }
 
-        //临时票据校验通过后，获取CAS端cookie中的全局门票userTicket，以此再获取用户会话
-
-        return JSONResult.ok();
+        //临时票据校验通过后，获取CAS端cookie中的全局门票userTicket，以此再换回用户会话
+        //1、验证并获取用户的userTicket
+        String userTicket = getCookie(USER_TICKET_COOKIE, request);
+        String userId = redisOperator.get(USER_TICKET_REDIS + ":" + userTicket);
+        if (StringUtils.isBlank(userId)) {
+            JSONResult.errorUserTicket("用户票据异常!");
+        }
+        //2、验证userTicket对应的user会话是否存在
+        String userRedis = redisOperator.get(USER_TOKEN_REDIS + ":" + userId);
+        if (StringUtils.isBlank(userRedis)) {
+            JSONResult.errorUserTicket("用户票据异常!");
+        }
+        //3、验证成功，回传user会话
+        return JSONResult.ok(JsonUtils.jsonToPojo(userRedis, UsersVO.class));
     }
 
     /**
@@ -155,5 +166,18 @@ public class HelloController {
         cookie.setDomain("sso.com");
         cookie.setPath("/");
         response.addCookie(cookie);
+    }
+
+    private String getCookie(String key,HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null || StringUtils.isBlank(key)) {
+            return null;
+        }
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals(key)) {
+                return cookie.getValue();
+            }
+        }
+        return null;
     }
 }
