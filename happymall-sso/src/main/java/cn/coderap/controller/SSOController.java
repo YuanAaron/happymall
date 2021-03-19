@@ -1,7 +1,6 @@
 package cn.coderap.controller;
 
 import cn.coderap.pojo.Users;
-import cn.coderap.pojo.bo.UserBO;
 import cn.coderap.pojo.vo.UsersVO;
 import cn.coderap.service.UserService;
 import cn.coderap.utils.*;
@@ -12,19 +11,17 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.UUID;
 
 @Controller
-public class HelloController {
+public class SSOController {
 
-    private final static Logger logger= LoggerFactory.getLogger(HelloController.class);
+    private final static Logger logger= LoggerFactory.getLogger(SSOController.class);
     public static final String USER_TOKEN_REDIS = "user_token";
 
     public static final String USER_TICKET_REDIS = "user_ticket";
