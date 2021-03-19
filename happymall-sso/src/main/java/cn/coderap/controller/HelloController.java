@@ -44,10 +44,42 @@ public class HelloController {
                         HttpServletRequest request,
                         HttpServletResponse response) {
         model.addAttribute("returnUrl",returnUrl);
-        //TODO 后续完善是否登录校验
+        //完善是否登录校验
+
+        //从cookie中获取userTicket，如果存在且
+        String userTicket = getCookie(USER_TICKET_COOKIE, request);
+
+        boolean isVerified = verifyUserTicket(userTicket);
+        if (isVerified) {
+            String tmpTicket = createTmpTicket();
+            return "redirect:" + returnUrl + "?tmpTicket=" + tmpTicket;
+        }
 
         //如果用户从未登录过，第一次访问则跳转到CAS的统一登录页面
         return "login";
+    }
+
+    /**
+     * 校验CAS全局用户门票
+     * @param userTicket
+     * @return
+     */
+    private boolean verifyUserTicket(String userTicket) {
+        //1、userTicket不能为空
+        if (StringUtils.isBlank(userTicket)) {
+            return false;
+        }
+        //2、userTicket是否有效
+        String userId = redisOperator.get(USER_TICKET_REDIS + ":" + userTicket);
+        if (StringUtils.isBlank(userId)) {
+            return false;
+        }
+        //3、验证userTicket对应的user会话是否存在
+        String userRedis = redisOperator.get(USER_TOKEN_REDIS + ":" + userId);
+        if (StringUtils.isBlank(userRedis)) {
+            return false;
+        }
+        return true;
     }
 
     /**
