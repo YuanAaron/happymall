@@ -46,7 +46,7 @@ public class HelloController {
         model.addAttribute("returnUrl",returnUrl);
         //完善是否登录校验
 
-        //从cookie中获取userTicket，如果存在且
+        //从cookie中获取userTicket，如果存在(用户登录过)，则签发一个一次性的临时票据tmpTicket
         String userTicket = getCookie(USER_TICKET_COOKIE, request);
 
         boolean isVerified = verifyUserTicket(userTicket);
@@ -97,7 +97,7 @@ public class HelloController {
      * @throws Exception
      */
     @PostMapping("/doLogin")
-    public String login(String username,
+    public String doLogin(String username,
                             String password,
                             String returnUrl,
                             Model model,
@@ -179,6 +179,32 @@ public class HelloController {
     }
 
     /**
+     * 问题：www.mvt.com点击退出登录后，该域名下的名为user的cookie在前端被清理，但是www.music.com中还会存在名为user的cookie，且页面上还是显示已登录，这会有什么影响吗？
+     * 思考：不会，假如你想继续在www.music.com站点下进行其他操作，肯定会请求到该系统的后端，此时肯定会有拦截器去判断当前用户的会话有没有（分布式会话的判断）
+     * 而redis中的userToken在logout时已经被删除了，因此会被要求进入CAS登录系统。
+     * @param userId
+     * @param request
+     * @param response
+     * @return
+     */
+    @PostMapping("/logout")
+    @ResponseBody
+    public JSONResult logout(String userId,
+                             HttpServletRequest request,
+                             HttpServletResponse response) {
+        //从cookie中获取CAS中的用户门票userTicket
+        String userTicket = getCookie(USER_TICKET_COOKIE, request);
+        //清除cookie中的userTicket票据
+        deleteCookie(USER_TICKET_COOKIE,response);
+        //清除redis中的userTicket票据
+        redisOperator.del(USER_TICKET_REDIS + ":" + userTicket);
+        //清除用户全局会话userToken(分布式会话)
+        redisOperator.del(USER_TOKEN_REDIS + ":" + userId);
+
+        return JSONResult.ok();
+    }
+
+    /**
      * 创建临时票据
      * @return
      */
@@ -211,5 +237,13 @@ public class HelloController {
             }
         }
         return null;
+    }
+
+    private void deleteCookie(String key,HttpServletResponse response) {
+        Cookie cookie = new Cookie(key, null);
+        cookie.setDomain("sso.com");
+        cookie.setPath("/");
+        cookie.setMaxAge(-1);
+        response.addCookie(cookie);
     }
 }
