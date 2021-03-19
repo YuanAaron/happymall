@@ -53,7 +53,7 @@ public class HelloController {
     /**
      * CAS的统一登录接口
      * 1、登录后创建用户的全局会话uniqueToken
-     * 2、创建用户全局门票userTicket，用以表示在CAS端是否登录过
+     * 2、创建用户全局门票userTicket，用以表示用户在CAS端是否登录过
      * 3、创建用户的临时票据tmpTicket，用以回跳时回传
      * @param username
      * @param password
@@ -101,10 +101,38 @@ public class HelloController {
         setCookie(USER_TICKET_COOKIE,userTicket,response); //TODO 可以对userTicket进行base64加密
         //4、全局门票userTicket关联用户id,并放到到redis中（以动物园为例，表示这个用户有门票了，可以在各个景区游玩）
         redisOperator.set(USER_TICKET_REDIS + ":" + userTicket, userRes.getId());
-        //5、生成临时票据tmpTicket（由CAS端签发的一个一次性的临时ticket），然后携带tmpTicket回跳到sso-mtv网站
+        //5、生成临时票据tmpTicket（由CAS端签发的一个一次性的临时ticket），然后携带tmpTicket回跳到sso-mtv/sso-music网站(相当于动物园中的某些收费馆)
         String tmpTicket = createTmpTicket();
-        return "login";
-//        return "redirect:" + returnUrl + "?tmpTicket=" + tmpTicket;
+
+        return "redirect:" + returnUrl + "?tmpTicket=" + tmpTicket;
+    }
+
+    /**
+     * 使用一次性票据到CAS验证以获取用户会话
+     * @param tmpTicket
+     * @return
+     */
+    @PostMapping("/verifyTmpTicket")
+    @ResponseBody
+    public JSONResult verifyTmpTicket(String tmpTicket,
+                                      HttpServletRequest request,
+                                      HttpServletResponse response) throws Exception {
+        String tmpTicketValue = redisOperator.get(TMP_TICKET_REDIS + ":" + tmpTicket);
+        if (StringUtils.isBlank(tmpTicketValue)) {
+            JSONResult.errorUserTicket("用户票据异常!");
+        }
+
+        //校验传过来的tmpTicket和redis中查到的tmpTicketValue是否一致
+        if (!tmpTicketValue.equals(MD5Utils.getMD5Str(tmpTicket))) {
+            JSONResult.errorUserTicket("用户票据异常!");
+        } else {
+            //临时票据校验通过，临时票据使用完后，需要销毁
+            redisOperator.del(TMP_TICKET_REDIS + ":" + tmpTicket);
+        }
+
+        //临时票据校验通过后，获取CAS端cookie中的全局门票userTicket，以此再获取用户会话
+
+        return JSONResult.ok();
     }
 
     /**
